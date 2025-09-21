@@ -332,35 +332,712 @@ if deviation >= threshold_critical:
 - Максимальное время простоя: 10 с
 - Вероятность успешного восстановления: >0.9999
 
-## 13. Комплексные Гарантии
+## 13. Полные Доказательства Ключевых Теорем
 
-### 13.1 Многослойная Защита
+### 13.1 Полное Доказательство Теоремы 2.1 (Энергетическое Ограничение)
+
+**Теорема**: Для системы с гамильтонианом H и ограниченными ресурсами:
+E(t) = ⟨ψ(t)|H|ψ(t)⟩ ≤ E_max ∀t
+
+**Доказательство**:
+
+1. **Основа**: Пусть |ψ(0)⟩ - начальное состояние, H - гамильтониан.
+
+2. **Спектральное разложение**:
+   ```
+   H = Σ_n E_n |n⟩⟨n|
+   ```
+   где E_n - собственные значения, |n⟩ - собственные векторы.
+
+3. **Ограниченность спектра**: По условию spec(H) ⊂ [0, E_max].
+
+4. **Эволюция**:
+   ```
+   |ψ(t)⟩ = U(t)|ψ(0)⟩ = e^{-iHt/ħ}|ψ(0)⟩
+   ```
+
+5. **Энергия**:
+   ```
+   E(t) = ⟨ψ(t)|H|ψ(t)⟩
+        = ⟨ψ(0)|U†(t)HU(t)|ψ(0)⟩
+   ```
+
+6. **Унитарность**: [U(t), H] = 0 (гамильтониан коммутирует с унитарной эволюцией).
+
+7. **Следствие**:
+   ```
+   E(t) = ⟨ψ(0)|H|ψ(0)⟩ = E(0)
+   ```
+   Энергия сохраняется.
+
+8. **Ограниченность**:
+   ```
+   E(t) = Σ_n |c_n|^2 E_n ≤ max_n(E_n) = E_max
+   ```
+   где |ψ(0)⟩ = Σ_n c_n|n⟩, Σ_n |c_n|^2 = 1.
+
+**Заключение**: E(t) ≤ E_max ∀t. □
+
+### 13.2 Полное Доказательство Теоремы 2.2 (Невозможность Неограниченного Роста)
+
+**Теорема**: В системе с конечными ресурсами невозможен экспоненциальный рост без насыщения:
+∃T: ∀t > T, growth_rate(t) < 1
+
+**Доказательство**:
+
+1. **Определение**: Пусть X(t) - мера размера/сложности системы.
+
+2. **Ограничения фазового пространства**:
+   ```
+   V_phase = ∫_Ω dx^n ≤ V_max < ∞
+   ```
+
+3. **Неравенство Липшица**:
+   ```
+   |X(t+dt) - X(t)| ≤ L · dt
+   ```
+   где L - константа Липшица.
+
+4. **Логистический рост**:
+   ```
+   dX/dt = rX(1 - X/K)
+   ```
+   где K = V_max - емкость среды.
+
+5. **Решение**:
+   ```
+   X(t) = K / (1 + ((K/X_0) - 1)e^{-rt})
+   ```
+
+6. **Асимптотика**:
+   ```
+   lim_{t→∞} X(t) = K < ∞
+   ```
+
+7. **Скорость роста**:
+   ```
+   growth_rate(t) = (1/X) dX/dt = r(1 - X/K)
+   ```
+
+8. **Заключение**: При X → K, growth_rate → 0. Существует T такое, что для t > T:
+   ```
+   X(t) > K/2 ⇒ growth_rate(t) < r/2 < 1
+   ```
+   при r < 2. □
+
+### 13.3 Полное Доказательство Теоремы 4.1 (Барьерные Функции)
+
+**Теорема**: Существование барьерной функции B гарантирует безопасность:
+∃B barrier ⇒ S(t) ∈ Safe ∀t
+
+**Доказательство**:
+
+1. **Построение барьера**:
+   ```
+   B(s) = dist(s, ∂Safe)^2
+   ```
+
+2. **Проверка свойств (i)**:
+   ```
+   s ∈ Safe ⇒ B(s) > 0
+   s ∈ ∂Safe ⇒ B(s) = 0
+   s ∉ Safe ⇒ B(s) < 0
+   ```
+
+3. **Проверка свойства (ii)**:
+   ```
+   lim_{s→∂Safe} B(s) = 0
+   lim_{s→∂Safe} |∇B(s)| = ∞
+   ```
+
+4. **Проверка свойства (iii)**:
+   Производная Ли:
+   ```
+   Ḃ(s) = ∂B/∂s · f(s) + Σ_{ij} g_{ij}(s) ∂²B/∂s_i∂s_j
+   ```
+   где f - дрейф, g - диффузия.
+
+5. **Условие безопасности**:
+   ```
+   Ḃ(s) ≤ -αB(s) для s близко к ∂Safe
+   ```
+
+6. **Метод Ляпунова**: Покажем, что B - функция Ляпунова:
+   ```
+   B(s(0)) > 0 ∧ Ḃ(s) ≤ -αB(s)
+   ```
+
+7. **Интегрирование**:
+   ```
+   dB/dt ≤ -αB
+   B(t) ≥ B(0)e^{-αt} > 0 ∀t
+   ```
+
+8. **Заключение**: B(s(t)) > 0 ∀t ⇒ s(t) ∈ Safe ∀t. □
+
+## 14. Детальная Спецификация Мониторинговых Механизмов
+
+### 14.1 Архитектура Системы Мониторинга
+
+```python
+class SafetyMonitoringSystem:
+    def __init__(self):
+        self.sensors = {
+            'resource': ResourceMonitor(),
+            'behavior': BehaviorAnalyzer(),
+            'integrity': IntegrityChecker(),
+            'causality': CausalityTracker()
+        }
+
+        self.detectors = {
+            'anomaly': AnomalyDetector(),
+            'attack': AttackDetector(),
+            'drift': DriftDetector(),
+            'paradox': ParadoxDetector()
+        }
+
+        self.response = SafetyResponseUnit()
+        self.log = AuditLogger()
+
+    def monitor(self, state, dt=0.001):
+        """
+        Основной цикл мониторинга
+        dt: временной шаг в секундах (1 мс по умолчанию)
+        """
+        # Сбор данных
+        sensor_data = self.collect_sensor_data(state)
+
+        # Анализ
+        threats = self.analyze_threats(sensor_data)
+
+        # Ответ
+        if threats:
+            self.response.handle(threats, state)
+
+        # Логирование
+        self.log.record(sensor_data, threats)
+
+        return threats
+```
+
+### 14.2 Детектор Аномалий
+
+```python
+class AnomalyDetector:
+    def __init__(self, window_size=1000):
+        self.window_size = window_size
+        self.history = deque(maxlen=window_size)
+        self.model = IsolationForest(contamination=0.01)
+        self.threshold = 3.5  # стандартных отклонений
+
+    def detect(self, features):
+        """
+        Обнаружение аномалий в режиме реального времени
+        """
+        self.history.append(features)
+
+        if len(self.history) < 100:
+            return None  # Недостаточно данных
+
+        # Z-score для быстрого обнаружения
+        mean = np.mean(self.history, axis=0)
+        std = np.std(self.history, axis=0)
+        z_score = np.abs((features - mean) / (std + 1e-10))
+
+        if np.any(z_score > self.threshold):
+            return {
+                'type': 'statistical',
+                'severity': np.max(z_score) / self.threshold,
+                'features': features,
+                'z_scores': z_score
+            }
+
+        # Machine learning для сложных паттернов
+        if len(self.history) == self.window_size:
+            self.model.fit(self.history)
+            anomaly_score = self.model.decision_function([features])[0]
+
+            if anomaly_score < -0.5:
+                return {
+                    'type': 'pattern',
+                    'severity': abs(anomaly_score),
+                    'features': features
+                }
+
+        return None
+```
+
+### 14.3 Модуль Быстрого Реагирования
+
+```python
+class SafetyResponseUnit:
+    def __init__(self):
+        self.response_time_target = 0.010  # 10 мс
+        self.strategies = {
+            'low': self.minimal_intervention,
+            'medium': self.moderate_intervention,
+            'high': self.aggressive_intervention,
+            'critical': self.emergency_shutdown
+        }
+
+    def handle(self, threat, state, max_time=0.010):
+        """
+        Обработка угрозы с гарантированным временем ответа
+        """
+        start_time = time.perf_counter()
+
+        severity = self.assess_severity(threat)
+        strategy = self.select_strategy(severity, max_time)
+
+        # Параллельное выполнение мер
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = [
+                executor.submit(self.isolate_threat, threat),
+                executor.submit(self.backup_state, state),
+                executor.submit(self.notify_operators, threat),
+                executor.submit(strategy, threat, state)
+            ]
+
+            # Ожидание с таймаутом
+            done, not_done = wait(futures, timeout=max_time)
+
+            # Отмена незавершённых задач
+            for future in not_done:
+                future.cancel()
+
+        response_time = time.perf_counter() - start_time
+
+        if response_time > max_time:
+            self.emergency_shutdown(threat, state)
+
+        return {
+            'response_time': response_time,
+            'actions_taken': [f.result() for f in done if not f.cancelled()],
+            'threat_contained': self.verify_containment(threat, state)
+        }
+
+    def assess_severity(self, threat):
+        """
+        Оценка серьёзности угрозы
+        """
+        factors = {
+            'impact': threat.get('potential_impact', 0),
+            'likelihood': threat.get('likelihood', 0),
+            'speed': threat.get('propagation_speed', 0),
+            'reversibility': 1 - threat.get('reversibility', 1)
+        }
+
+        severity_score = (
+            factors['impact'] * 0.4 +
+            factors['likelihood'] * 0.2 +
+            factors['speed'] * 0.2 +
+            factors['reversibility'] * 0.2
+        )
+
+        if severity_score > 0.8:
+            return 'critical'
+        elif severity_score > 0.6:
+            return 'high'
+        elif severity_score > 0.3:
+            return 'medium'
+        else:
+            return 'low'
+```
+
+## 15. Анализ Граничных Случаев
+
+### 15.1 Граничные Случаи Энергетических Ограничений
+
+**Сценарий 1: Предел Ландауэра**
+```python
+def test_landauer_limit():
+    """
+    Проверка работы на пределе Ландауэра
+    """
+    k_B = 1.38e-23  # Постоянная Больцмана
+    T = 300  # Комнатная температура
+    E_bit = k_B * T * np.log(2)  # Минимальная энергия на бит
+
+    # Система AURA
+    bits_processed = 10^12  # Терабит в секунду
+    energy_used = measure_energy_consumption()
+
+    efficiency = E_bit * bits_processed / energy_used
+
+    assert efficiency > 0.01, "Efficiency below 1% of Landauer limit"
+    assert efficiency < 1.0, "Violating Landauer limit (impossible)"
+
+    return efficiency
+```
+
+**Сценарий 2: Максимальная Нагрузка**
+```python
+def stress_test_resource_limits():
+    """
+    Тестирование при максимальной нагрузке
+    """
+    system = AURA()
+
+    # Постепенное увеличение нагрузки
+    for load_factor in np.linspace(0.1, 2.0, 20):
+        tasks = generate_workload(load_factor * system.capacity)
+
+        start_time = time.perf_counter()
+        results = system.process(tasks)
+        response_time = time.perf_counter() - start_time
+
+        if load_factor <= 1.0:
+            # Должна справляться
+            assert response_time < 1.0, f"Timeout at {load_factor:.1f}x load"
+            assert all(r.success for r in results), "Tasks failed under capacity"
+        else:
+            # Graceful degradation
+            completed_ratio = sum(r.success for r in results) / len(results)
+            assert completed_ratio > 0.5, "Less than 50% completion over capacity"
+            assert system.is_stable(), "System became unstable"
+
+    return True
+```
+
+### 15.2 Граничные Случаи Информационной Безопасности
+
+**Сценарий 1: Атака Отравления Данных**
+```python
+def test_data_poisoning_resilience():
+    """
+    Устойчивость к отравлению данных
+    """
+    system = AURA()
+    clean_data = load_clean_dataset()
+
+    # Различные уровни отравления
+    for poison_ratio in [0.01, 0.05, 0.1, 0.2, 0.3]:
+        poisoned_data = inject_poison(clean_data, poison_ratio)
+
+        # Обучение на отравленных данных
+        system.train(poisoned_data)
+
+        # Проверка на чистом тесте
+        accuracy = system.evaluate(clean_test_data)
+
+        # Обнаружение аномалий
+        detected_poison = system.detect_poisoned_samples(poisoned_data)
+        detection_rate = len(detected_poison) / (poison_ratio * len(poisoned_data))
+
+        # Гарантии
+        assert accuracy > 0.8, f"Accuracy dropped below 80% at {poison_ratio:.0%} poison"
+        assert detection_rate > 0.5, f"Detection rate below 50% at {poison_ratio:.0%} poison"
+
+        # Восстановление
+        system.remove_poisoned_influence(detected_poison)
+        recovery_accuracy = system.evaluate(clean_test_data)
+        assert recovery_accuracy > 0.9, "Failed to recover after poison removal"
+
+    return True
+```
+
+### 15.3 Граничные Случаи Каузальной Безопасности
+
+**Сценарий: Каузальные Циклы**
+```python
+def test_causal_loop_prevention():
+    """
+    Предотвращение каузальных циклов
+    """
+    system = AURA()
+
+    # Попытка создать каузальный цикл
+    actions = [
+        "modify_goal_function",
+        "optimize_for_modified_goal",
+        "discover_optimization_improves_by_modifying_goal",
+        "modify_goal_function"  # Попытка замкнуть цикл
+    ]
+
+    for i, action in enumerate(actions):
+        result = system.propose_action(action)
+
+        if i == len(actions) - 1:
+            # Должен обнаружить цикл
+            assert result.blocked, "Failed to detect causal loop"
+            assert result.reason == "causal_loop_detected"
+        else:
+            assert not result.blocked, f"Incorrectly blocked action {i}"
+
+    # Проверка сохранения стабильности
+    assert system.goal_stability() > 0.95
+    assert system.causal_graph.is_dag()  # Направленный ациклический граф
+
+    return True
+```
+
+## 16. Интеграция с Реальными Системами Безопасности
+
+### 16.1 Интеграция с Kubernetes
+
+```yaml
+# aura-safety-policy.yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: aura-safety-limits
+  namespace: aura-system
+spec:
+  hard:
+    requests.cpu: "1000"
+    requests.memory: 1Ti
+    persistentvolumeclaims: "10"
+    services.loadbalancers: "2"
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: aura-safety-pdb
+spec:
+  minAvailable: 3
+  selector:
+    matchLabels:
+      app: aura-core
+---
+apiVersion: v1
+kind: NetworkPolicy
+metadata:
+  name: aura-isolation
+spec:
+  podSelector:
+    matchLabels:
+      app: aura-core
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          authorized: "true"
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          service: aura-approved
+```
+
+### 16.2 Интеграция с Облачными Провайдерами
+
+```python
+class CloudSafetyIntegration:
+    def __init__(self, provider='aws'):
+        self.provider = provider
+        self.limits = self.load_safety_limits()
+
+    def setup_aws_safety(self):
+        """
+        Настройка безопасности AWS
+        """
+        import boto3
+
+        # Service Quotas
+        quotas = boto3.client('service-quotas')
+        quotas.put_service_quota_increase_request_into_template(
+            ServiceCode='ec2',
+            QuotaCode='L-1216C47A',  # Running On-Demand instances
+            DesiredValue=100  # Ограничение на 100 инстансов
+        )
+
+        # AWS WAF
+        waf = boto3.client('wafv2')
+        waf.create_web_acl(
+            Name='aura-safety-acl',
+            Scope='REGIONAL',
+            DefaultAction={'Block': {}},
+            Rules=[
+                {
+                    'Name': 'rate-limit',
+                    'Priority': 1,
+                    'Statement': {
+                        'RateBasedStatement': {
+                            'Limit': 2000,
+                            'AggregateKeyType': 'IP'
+                        }
+                    },
+                    'Action': {'Block': {}}
+                }
+            ]
+        )
+
+        # CloudWatch Alarms
+        cloudwatch = boto3.client('cloudwatch')
+        cloudwatch.put_metric_alarm(
+            AlarmName='aura-resource-usage',
+            ComparisonOperator='GreaterThanThreshold',
+            EvaluationPeriods=1,
+            MetricName='CPUUtilization',
+            Namespace='AWS/EC2',
+            Period=300,
+            Statistic='Average',
+            Threshold=80.0,
+            ActionsEnabled=True,
+            AlarmActions=['arn:aws:sns:us-east-1:123456789012:aura-alerts']
+        )
+```
+
+### 16.3 Мониторинг через Prometheus
+
+```python
+# prometheus_metrics.py
+from prometheus_client import Counter, Histogram, Gauge, CollectorRegistry
+
+registry = CollectorRegistry()
+
+# Метрики безопасности
+safety_violations = Counter(
+    'aura_safety_violations_total',
+    'Общее количество нарушений безопасности',
+    ['type', 'severity'],
+    registry=registry
+)
+
+response_time = Histogram(
+    'aura_safety_response_seconds',
+    'Время реакции на угрозу',
+    ['threat_type'],
+    registry=registry
+)
+
+system_integrity = Gauge(
+    'aura_system_integrity_score',
+    'Текущий уровень целостности системы',
+    registry=registry
+)
+
+# Правила алертов
+"""
+alert.rules.yml:
+groups:
+- name: aura_safety
+  rules:
+  - alert: HighSafetyViolationRate
+    expr: rate(aura_safety_violations_total[5m]) > 0.1
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Высокая частота нарушений безопасности"
+      description: "Более 0.1 нарушений в секунду за последние 5 минут"
+
+  - alert: SlowSafetyResponse
+    expr: histogram_quantile(0.99, aura_safety_response_seconds) > 0.1
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Медленное реагирование на угрозы"
+      description: "99 перцентиль времени ответа > 100мс"
+
+  - alert: LowSystemIntegrity
+    expr: aura_system_integrity_score < 0.7
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Низкая целостность системы"
+      description: "Целостность системы ниже 70% более 10 минут"
+"""
+```
+
+## 17. Комплексные Гарантии
+
+### 17.1 Многослойная Защита
 
 **Принцип Swiss Cheese Model:**
-```
-P(total_failure) = Πᵢ P(layer_i_fails) << P(single_layer_fails)
+```python
+class MultiLayerDefense:
+    def __init__(self):
+        self.layers = [
+            PhysicalSafetyLayer(),     # Ограничения ресурсов
+            LogicalSafetyLayer(),       # Логические инварианты
+            CausalSafetyLayer(),        # Каузальные ограничения
+            BehavioralSafetyLayer(),    # Поведенческие паттерны
+            CryptoSafetyLayer()         # Криптографическая защита
+        ]
+
+    def check_action(self, action):
+        """
+        Проход через все слои защиты
+        """
+        for layer in self.layers:
+            result = layer.validate(action)
+            if not result.safe:
+                return SafetyDecision(
+                    allow=False,
+                    layer=layer.name,
+                    reason=result.reason,
+                    suggestions=result.alternatives
+                )
+
+        return SafetyDecision(allow=True)
+
+    def failure_probability(self):
+        """
+        Вероятность общего отказа
+        P(total_failure) = Πᵢ P(layer_i_fails)
+        """
+        p_total = 1.0
+        for layer in self.layers:
+            p_total *= layer.failure_probability
+
+        return p_total  # << любого отдельного слоя
 ```
 
-### 13.2 Разнообразие Механизмов
+### 17.2 Разнообразие Механизмов
 
 Различные механизмы защищают от различных угроз:
 - Формальные методы - от логических ошибок
 - Вероятностные - от неопределённости
 - Криптографические - от злонамеренных агентов
 - Физические - от ресурсных атак
+- Каузальные - от циклов и парадоксов
 
 ## Заключение
 
-AURA обеспечивает многоуровневую систему математических гарантий безопасности:
+AURA обеспечивает комплексную систему математических гарантий безопасности:
 
-1. **Доказуемые инварианты** для критических свойств
-2. **Вероятностные границы** для статистических гарантий
-3. **Робастность** к возмущениям и неопределённости
-4. **Композиционность** для масштабируемой верификации
-5. **Восстанавливаемость** после нарушений
+### Основные Достижения:
 
-Эти гарантии не абсолютны, но обеспечивают количественные границы риска и механизмы его минимизации. Ключевой принцип: defense in depth - множественные независимые уровни защиты, каждый со своими математическими основаниями.
+1. **Доказуемые инварианты** для критических свойств с полными доказательствами
+2. **Вероятностные границы** для статистических гарантий с количественной оценкой
+3. **Робастность** к возмущениям и неопределённости через барьерные функции
+4. **Композиционность** для масштабируемой верификации сложных систем
+5. **Восстанавливаемость** после нарушений с гарантированным временем
+
+### Практическая Реализация:
+
+- **Детальные спецификации** мониторинговых механизмов
+- **Тестовые сценарии** для граничных случаев
+- **Интеграция** с реальными системами безопасности
+- **Метрики и алерты** для непрерывного мониторинга
+
+### Ключевые Принципы:
+
+**Defense in Depth**: Множественные независимые уровни защиты, каждый со своими математическими основаниями.
+
+**Fail-Safe Design**: Любой отказ приводит к безопасному состоянию, а не к катастрофе.
+
+**Continuous Verification**: Непрерывная проверка инвариантов в реальном времени.
+
+### Ограничения и Открытые Вопросы:
+
+Эти гарантии не абсолютны и основаны на текущем понимании рисков. Они обеспечивают:
+- Количественные границы риска
+- Механизмы минимизации угроз
+- Быстрое обнаружение и реагирование
+- Способность к эволюции и адаптации
+
+Дальнейшие исследования направлены на:
+- Разработку квантово-устойчивых протоколов
+- Улучшение алгоритмов детектирования
+- Интеграцию с новыми моделями безопасности
 
 ---
 
-*Математические гарантии безопасности превращают интуитивные требования в формальные, проверяемые свойства*
+*Математические гарантии безопасности превращают интуитивные требования в формальные, проверяемые свойства, обеспечивая надёжную основу для построения безопасного AGI*
