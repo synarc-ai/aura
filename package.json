@@ -1,0 +1,16 @@
+{
+  "name": "aura",
+  "version": "0.3.0",
+  "description": "Adaptive Unified Resonant Architecture",
+  "type": "module",
+  "scripts": {
+    "merge": "bun run merge-docs.ts",
+    "merge:docs": "bun run merge-docs.ts"
+  },
+  "keywords": ["aura", "AGI", "agents"],
+  "author": "LuxQuant",
+  "license": "MIT",
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}
