@@ -250,7 +250,148 @@ C: ℳ → ℳ
 
 представляет самомодель системы.
 
-## 12. Заключение
+## 12. Категориальные Паттерны в Коде
+
+### 12.1 Mapping на TypeScript/Rust Типы
+
+**Категории как типы:**
+```typescript
+// Категория как интерфейс с объектами и морфизмами
+interface Category<Obj, Morph> {
+  objects: Set<Obj>;
+  morphisms: Map<[Obj, Obj], Morph[]>;
+  compose: (f: Morph, g: Morph) => Morph;
+  identity: (obj: Obj) => Morph;
+}
+
+// Функтор как преобразование между категориями
+interface Functor<C1 extends Category, C2 extends Category> {
+  mapObject: (obj: C1['objects']) => C2['objects'];
+  mapMorphism: (morph: C1['morphisms']) => C2['morphisms'];
+}
+
+// Естественное преобразование между функторами
+interface NaturalTransformation<F1 extends Functor, F2 extends Functor> {
+  components: Map<Object, Morphism>;
+  naturality: () => boolean; // проверка коммутативности
+}
+```
+
+**Rust реализация с типобезопасностью:**
+```rust
+trait Category {
+    type Object;
+    type Morphism: Clone;
+
+    fn compose(&self, f: &Self::Morphism, g: &Self::Morphism) -> Self::Morphism;
+    fn identity(&self, obj: &Self::Object) -> Self::Morphism;
+}
+
+trait Functor<C1: Category, C2: Category> {
+    fn map_object(&self, obj: &C1::Object) -> C2::Object;
+    fn map_morphism(&self, morph: &C1::Morphism) -> C2::Morphism;
+}
+```
+
+### 12.2 Композиция в Реальных Модулях
+
+**Пример: Transformer attention как функтор**
+
+Механизм внимания в Transformer можно рассматривать как функтор между категориями:
+
+```typescript
+// Категория последовательностей
+class SequenceCategory implements Category<Token[], Transform> {
+  // Объекты: последовательности токенов
+  objects = new Set<Token[]>();
+
+  // Морфизмы: трансформации последовательностей
+  morphisms = new Map<[Token[], Token[]], Transform[]>();
+
+  compose(f: Transform, g: Transform): Transform {
+    return (seq: Token[]) => g(f(seq));
+  }
+
+  identity(seq: Token[]): Transform {
+    return (s: Token[]) => s;
+  }
+}
+
+// Категория представлений
+class RepresentationCategory implements Category<Embedding[], LinearMap> {
+  // Объекты: векторные представления
+  objects = new Set<Embedding[]>();
+
+  // Морфизмы: линейные преобразования
+  morphisms = new Map<[Embedding[], Embedding[]], LinearMap[]>();
+
+  compose(f: LinearMap, g: LinearMap): LinearMap {
+    return (emb: Embedding[]) => g.apply(f.apply(emb));
+  }
+}
+
+// Attention как функтор
+class AttentionFunctor implements Functor<SequenceCategory, RepresentationCategory> {
+  constructor(
+    private Q: Matrix, // Query projection
+    private K: Matrix, // Key projection
+    private V: Matrix  // Value projection
+  ) {}
+
+  mapObject(tokens: Token[]): Embedding[] {
+    // Преобразование токенов в эмбеддинги
+    return tokens.map(t => this.embed(t));
+  }
+
+  mapMorphism(transform: Transform): LinearMap {
+    // Преобразование трансформаций последовательностей
+    // в линейные операции над эмбеддингами
+    return new LinearMap(
+      this.computeAttentionMatrix(transform)
+    );
+  }
+
+  private computeAttentionMatrix(transform: Transform): Matrix {
+    // QK^T / sqrt(d) → softmax → V
+    const scores = this.Q.multiply(this.K.transpose()).scale(1/Math.sqrt(this.dim));
+    const weights = softmax(scores);
+    return weights.multiply(this.V);
+  }
+}
+```
+
+### 12.3 Сравнение с Практическими Архитектурами
+
+| Архитектура | Категориальная Интерпретация | Преимущества | Ограничения |
+|-------------|------------------------------|--------------|-------------|
+| **Transformer** | Функтор между последовательностями и представлениями | Композиционность, параллелизм | Квадратичная сложность |
+| **CNN** | Функтор с локальными морфизмами (свёртки) | Эффективность, инвариантность | Фиксированная рецептивная область |
+| **RNN** | Рекурсивный эндофунктор | Переменная длина входа | Затухание градиентов |
+| **GNN** | Функтор на категории графов | Структурная информация | Сложность агрегации |
+| **AURA** | Иерархия категорий с естественными преобразованиями | Универсальность, адаптивность | Высокая сложность |
+
+### 12.4 Практическая Польза Категориального Подхода
+
+**1. Гарантии композиционности:**
+```typescript
+// Категориальные законы гарантируют корректность композиции
+assert(functor.map(compose(f, g)) === compose(functor.map(f), functor.map(g)));
+```
+
+**2. Переиспользование абстракций:**
+```typescript
+// Один и тот же функтор для разных категорий
+class UniversalEncoder<C1, C2> implements Functor<C1, C2> {
+  // Работает для любых категорий с совместимой структурой
+}
+```
+
+**3. Доказуемые свойства:**
+- Сохранение структуры при преобразованиях
+- Эквивалентность различных путей вычислений
+- Оптимальность композиций
+
+## 13. Заключение
 
 Категориальный подход к интеллекту в AURA обеспечивает:
 

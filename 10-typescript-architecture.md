@@ -1017,6 +1017,442 @@ export async function createAura(config: SystemConfig): Promise<IAuraAPI> {
 }
 ```
 
+## 11. Прототип vs Продакшн
+
+### 11.1 Упрощения для Быстрого Прототипирования
+
+```typescript
+// ПРОТОТИП: Простая in-memory реализация
+class PrototypeAgent implements IAgent {
+  private state: any = {};
+
+  async perceive(field: IStigmergicField): Promise<Perception> {
+    // Упрощённое восприятие - только ближайшие соседи
+    return {
+      local: { neighbors: 3 },
+      global: null,
+      temporal: null,
+      uncertainty: 0.5
+    } as any;
+  }
+
+  async decide(perception: Perception): Promise<Action> {
+    // Случайное решение для быстрого теста
+    return {
+      type: Math.random() > 0.5 ? 'move' : 'wait',
+      target: null,
+      intensity: Math.random(),
+      expectedUtility: 0
+    } as any;
+  }
+
+  async act(action: Action): Promise<void> {
+    // Просто логируем действие
+    console.log(`Agent ${this.id} performs ${action.type}`);
+  }
+
+  update(dt: number): void {
+    // Заглушка
+  }
+}
+
+// ПРОДАКШН: Полная реализация с оптимизациями
+class ProductionAgent implements IAgent {
+  private readonly stateBuffer: SharedArrayBuffer;
+  private readonly neuralNet: NeuralNetwork;
+  private readonly memoryPool: ObjectPool<MemoryItem>;
+
+  constructor(config: AgentConfig) {
+    // Использование SharedArrayBuffer для zero-copy между воркерами
+    this.stateBuffer = new SharedArrayBuffer(config.stateSize);
+
+    // Предобученная нейросеть для принятия решений
+    this.neuralNet = new NeuralNetwork(config.modelPath);
+
+    // Object pooling для уменьшения GC pressure
+    this.memoryPool = new ObjectPool(MemoryItem, 1000);
+  }
+
+  async perceive(field: IStigmergicField): Promise<Perception> {
+    // Параллельное считывание из нескольких слоёв поля
+    const [local, global, temporal] = await Promise.all([
+      this.perceiveLocal(field),
+      this.perceiveGlobal(field),
+      this.perceiveTemporal(field)
+    ]);
+
+    // Байесовская оценка неопределённости
+    const uncertainty = this.calculateUncertainty(local, global, temporal);
+
+    return { local, global, temporal, uncertainty };
+  }
+
+  // ... полная реализация
+}
+```
+
+### 11.2 Технический Долг и План Рефакторинга
+
+```typescript
+interface TechnicalDebt {
+  readonly id: string;
+  readonly description: string;
+  readonly impact: 'low' | 'medium' | 'high';
+  readonly effort: number; // в человеко-днях
+  readonly priority: number;
+}
+
+const TECHNICAL_DEBT_REGISTRY: TechnicalDebt[] = [
+  {
+    id: 'TD-001',
+    description: 'Синхронная инициализация агентов блокирует UI',
+    impact: 'medium',
+    effort: 3,
+    priority: 1
+  },
+  {
+    id: 'TD-002',
+    description: 'Отсутствует кэширование в perception pipeline',
+    impact: 'high',
+    effort: 5,
+    priority: 2
+  },
+  {
+    id: 'TD-003',
+    description: 'Memory leak в event subscriptions',
+    impact: 'high',
+    effort: 2,
+    priority: 1
+  }
+];
+
+// План поэтапного рефакторинга
+const REFACTORING_PLAN = {
+  phase1: {
+    // Критические исправления
+    duration: '1 sprint',
+    tasks: ['TD-001', 'TD-003'],
+    goal: 'Стабилизация'
+  },
+  phase2: {
+    // Оптимизации производительности
+    duration: '2 sprints',
+    tasks: ['TD-002'],
+    goal: 'Ускорение в 2x'
+  },
+  phase3: {
+    // Архитектурные улучшения
+    duration: '1 месяц',
+    tasks: ['Миграция на Web Workers', 'Введение WASM модулей'],
+    goal: 'Масштабируемость'
+  }
+};
+```
+
+## 12. Интеграция с Существующими Фреймворками
+
+### 12.1 Использование TensorFlow.js для ML
+
+```typescript
+import * as tf from '@tensorflow/tfjs';
+
+class TensorFlowIntegration {
+  private model: tf.LayersModel;
+
+  async loadModel(url: string): Promise<void> {
+    this.model = await tf.loadLayersModel(url);
+  }
+
+  async predict(input: Float32Array): Promise<Float32Array> {
+    // Конвертация в тензор TensorFlow
+    const inputTensor = tf.tensor(input, [1, input.length]);
+
+    // Предсказание
+    const output = this.model.predict(inputTensor) as tf.Tensor;
+
+    // Конвертация обратно
+    const result = await output.data();
+
+    // Очистка памяти
+    inputTensor.dispose();
+    output.dispose();
+
+    return result as Float32Array;
+  }
+
+  // Федеративное обучение прямо в браузере
+  async trainFederated(
+    localData: tf.data.Dataset<tf.TensorContainer>
+  ): Promise<void> {
+    await this.model.fitDataset(localData, {
+      epochs: 5,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          console.log(`Epoch ${epoch}: loss = ${logs?.loss}`);
+        }
+      }
+    });
+
+    // Отправка градиентов на сервер для агрегации
+    const weights = this.model.getWeights();
+    await this.sendGradients(weights);
+  }
+}
+```
+
+### 12.2 Интеграция с LangChain для NLP
+
+```typescript
+import { OpenAI } from 'langchain/llms/openai';
+import { ConversationChain } from 'langchain/chains';
+import { BufferMemory } from 'langchain/memory';
+
+class LangChainIntegration {
+  private chain: ConversationChain;
+
+  constructor() {
+    const llm = new OpenAI({
+      temperature: 0.7,
+      modelName: 'gpt-4'
+    });
+
+    const memory = new BufferMemory();
+
+    this.chain = new ConversationChain({
+      llm,
+      memory
+    });
+  }
+
+  async processNaturalLanguage(input: string): Promise<string> {
+    // Использование LangChain для понимания намерений
+    const response = await this.chain.call({ input });
+    return response.response;
+  }
+
+  // Интеграция с AURA agents
+  async translateToAgentGoals(nlInput: string): Promise<Goal[]> {
+    const prompt = `
+      Convert this natural language request into structured goals:
+      "${nlInput}"
+
+      Format as JSON array of goals with properties:
+      - description
+      - priority (1-10)
+      - preconditions
+      - postconditions
+    `;
+
+    const response = await this.chain.call({ input: prompt });
+    return JSON.parse(response.response);
+  }
+}
+```
+
+### 12.3 ONNX Runtime для Кросс-платформенной Совместимости
+
+```typescript
+import * as ort from 'onnxruntime-web';
+
+class ONNXIntegration {
+  private session: ort.InferenceSession;
+
+  async loadModel(modelPath: string): Promise<void> {
+    this.session = await ort.InferenceSession.create(modelPath, {
+      executionProviders: ['webgl', 'wasm', 'cpu'],
+      graphOptimizationLevel: 'all'
+    });
+  }
+
+  async runInference(input: Float32Array): Promise<Float32Array> {
+    // Создание ONNX тензора
+    const tensor = new ort.Tensor('float32', input, [1, input.length]);
+
+    // Запуск модели
+    const feeds = { input: tensor };
+    const results = await this.session.run(feeds);
+
+    // Извлечение результата
+    const output = results.output;
+    return output.data as Float32Array;
+  }
+
+  // Поддержка моделей из разных фреймворков
+  async convertAndRun(
+    model: any,
+    framework: 'pytorch' | 'tensorflow' | 'jax'
+  ): Promise<void> {
+    // Конвертация модели в ONNX формат
+    const onnxModel = await this.convertToONNX(model, framework);
+
+    // Оптимизация для целевой платформы
+    const optimized = await this.optimizeForTarget(onnxModel, {
+      target: 'web',
+      precision: 'fp16'
+    });
+
+    // Запуск оптимизированной модели
+    await this.loadModel(optimized);
+  }
+}
+```
+
+## 13. Практические Примеры Реального Использования
+
+### 13.1 Пример: Распознавание Паттернов в Реальном Времени
+
+```typescript
+// Полный рабочий пример системы распознавания паттернов
+class PatternRecognitionSystem {
+  private agents: Map<AgentId, PatternAgent>;
+  private field: StigmergicField;
+  private patterns: PatternLibrary;
+
+  async detectPattern(input: ImageData): Promise<Pattern[]> {
+    // 1. Препроцессинг изображения
+    const processed = await this.preprocessImage(input);
+
+    // 2. Распределение по агентам
+    const chunks = this.divideIntoChunks(processed, this.agents.size);
+
+    // 3. Параллельная обработка агентами
+    const localPatterns = await Promise.all(
+      Array.from(this.agents.values()).map((agent, i) =>
+        agent.findLocalPatterns(chunks[i])
+      )
+    );
+
+    // 4. Стигмергическая координация
+    for (const patterns of localPatterns) {
+      for (const pattern of patterns) {
+        await this.field.deposit(
+          pattern.position,
+          'pattern',
+          pattern.confidence
+        );
+      }
+    }
+
+    // 5. Эмерджентное выявление глобальных паттернов
+    await this.field.evolve(100); // 100ms эволюции
+
+    // 6. Сбор результатов
+    const globalPatterns = await this.extractGlobalPatterns();
+
+    return globalPatterns;
+  }
+
+  private async extractGlobalPatterns(): Promise<Pattern[]> {
+    const threshold = 0.7;
+    const patterns: Pattern[] = [];
+
+    // Поиск пиков в стигмергическом поле
+    for (let x = 0; x < this.field.dimensions[0]; x++) {
+      for (let y = 0; y < this.field.dimensions[1]; y++) {
+        const value = await this.field.sample([x, y, 0], 'pattern');
+
+        if (value > threshold) {
+          const gradient = await this.field.gradient([x, y, 0], 'pattern');
+
+          // Проверка что это локальный максимум
+          if (Math.abs(gradient[0]) < 0.1 && Math.abs(gradient[1]) < 0.1) {
+            patterns.push({
+              position: [x, y, 0],
+              confidence: value,
+              type: await this.classifyPattern([x, y, 0])
+            });
+          }
+        }
+      }
+    }
+
+    return patterns;
+  }
+}
+
+// Использование
+async function example() {
+  const system = new PatternRecognitionSystem();
+
+  // Загрузка изображения
+  const image = await loadImage('complex-pattern.jpg');
+
+  // Детекция паттернов
+  const patterns = await system.detectPattern(image);
+
+  console.log(`Found ${patterns.length} patterns:`);
+  patterns.forEach(p => {
+    console.log(`- ${p.type} at (${p.position}) with confidence ${p.confidence}`);
+  });
+}
+```
+
+### 13.2 Пример: Каузальное Планирование
+
+```typescript
+class CausalPlanningExample {
+  private planner: CausalPlanner;
+  private agents: AgentPool;
+
+  async planComplexTask(): Promise<void> {
+    // Определение начального состояния
+    const initialState: WorldState = {
+      resources: { energy: 100, materials: 50 },
+      agents: { available: 10, busy: 0 },
+      goals: { achieved: [], pending: ['build-structure'] }
+    };
+
+    // Определение целевого состояния
+    const goalState: WorldState = {
+      resources: { energy: 20, materials: 0 },
+      agents: { available: 10, busy: 0 },
+      goals: { achieved: ['build-structure'], pending: [] }
+    };
+
+    // Генерация каузального плана
+    const plan = await this.planner.generatePlan(initialState, goalState);
+
+    console.log('Generated plan:');
+    plan.steps.forEach((step, i) => {
+      console.log(`${i + 1}. ${step.action.type}`);
+      console.log(`   Preconditions: ${JSON.stringify(step.preconditions)}`);
+      console.log(`   Effects: ${JSON.stringify(step.effects)}`);
+      console.log(`   Duration: ${step.duration}ms`);
+    });
+
+    // Исполнение плана с адаптацией
+    for await (const step of this.planner.execute(plan)) {
+      try {
+        // Назначение агентов для выполнения шага
+        const assignedAgents = await this.agents.assign(step.action);
+
+        // Выполнение действия
+        await Promise.all(
+          assignedAgents.map(agent => agent.act(step.action))
+        );
+
+        // Проверка достижения эффектов
+        const actualState = await this.measureState();
+
+        if (!this.validateEffects(step.effects, actualState)) {
+          // Адаптация плана при отклонении
+          const revisedPlan = await this.planner.adapt(plan, actualState);
+          console.log('Plan adapted due to unexpected state');
+          plan = revisedPlan;
+        }
+      } catch (error) {
+        console.error(`Step failed: ${error}`);
+        // Перепланирование с текущего состояния
+        const currentState = await this.measureState();
+        plan = await this.planner.generatePlan(currentState, goalState);
+      }
+    }
+
+    console.log('Goal achieved!');
+  }
+}
+```
+
 ## Заключение
 
 TypeScript архитектура AURA обеспечивает:

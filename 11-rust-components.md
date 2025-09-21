@@ -1673,6 +1673,224 @@ impl<T: Send + 'static> DataPipeline<T> {
 }
 ```
 
+## 9. Критические Пути Производительности
+
+### 9.1 Профилирование и Оптимизация
+
+#### Инструменты Профилирования
+
+```rust
+// Использование perf и flamegraph
+#[cfg(feature = "profiling")]
+pub mod profiling {
+    use pprof::ProfilerGuardBuilder;
+    use std::fs::File;
+
+    pub fn start_profiling() -> ProfilerGuard<'static> {
+        ProfilerGuardBuilder::default()
+            .frequency(1000)
+            .blocklist(&["libc", "libgcc", "pthread"])
+            .build()
+            .unwrap()
+    }
+
+    pub fn save_flamegraph(guard: ProfilerGuard, path: &str) {
+        let report = guard.report().build().unwrap();
+        let file = File::create(path).unwrap();
+        report.flamegraph(&file).unwrap();
+    }
+}
+
+// Критические секции с измерением
+#[inline(always)]
+pub fn critical_computation<T, F: FnOnce() -> T>(name: &str, f: F) -> T {
+    #[cfg(feature = "metrics")]
+    let start = std::time::Instant::now();
+
+    let result = f();
+
+    #[cfg(feature = "metrics")]
+    {
+        let elapsed = start.elapsed();
+        metrics::histogram!("critical_path_duration", elapsed, "name" => name);
+        if elapsed > Duration::from_millis(10) {
+            warn!("Slow critical path {}: {:?}", name, elapsed);
+        }
+    }
+
+    result
+}
+```
+
+### 9.2 Когда Rust Необходим vs Nice-to-Have
+
+#### Обязательное Использование Rust
+
+```rust
+// 1. Горячие циклы обработки агентов (>1M итераций/сек)
+pub struct HotPathProcessor {
+    agents: Vec<Agent>,
+    // SIMD-оптимизированные операции
+    simd_buffers: AlignedVec<f32>,
+}
+
+// 2. Lock-free структуры данных для межпотокового взаимодействия
+pub struct LockFreeQueue<T> {
+    head: AtomicPtr<Node<T>>,
+    tail: AtomicPtr<Node<T>>,
+}
+
+// 3. Управление памятью для миллиардов агентов
+pub struct AgentPool {
+    // Custom аллокатор с pool allocation
+    allocator: PoolAllocator,
+    // Memory-mapped файлы для больших данных
+    mmap_regions: Vec<MmapMut>,
+}
+```
+
+#### Опциональное Использование Rust
+
+```rust
+// Можно начать с TypeScript, потом оптимизировать
+pub enum OptimizationLevel {
+    // Начальная реализация на TypeScript
+    TypeScriptPrototype,
+    // Критические функции на Rust через WASM
+    HybridWasm { critical_functions: Vec<String> },
+    // Полная реализация на Rust
+    FullRust,
+}
+
+impl OptimizationLevel {
+    pub fn decide(metrics: &PerformanceMetrics) -> Self {
+        match metrics.bottleneck() {
+            Bottleneck::None => Self::TypeScriptPrototype,
+            Bottleneck::SpecificFunctions(fns) => {
+                Self::HybridWasm { critical_functions: fns }
+            }
+            Bottleneck::Systemic => Self::FullRust,
+        }
+    }
+}
+```
+
+### 9.3 Практические Примеры FFI с TypeScript
+
+#### Биндинги через Node-API
+
+```rust
+use napi::bindgen_prelude::*;
+use napi_derive::napi;
+
+#[napi]
+pub struct RustAgentEngine {
+    inner: Arc<Mutex<AgentEngine>>,
+}
+
+#[napi]
+impl RustAgentEngine {
+    #[napi(constructor)]
+    pub fn new(config: String) -> Result<Self> {
+        let config: EngineConfig = serde_json::from_str(&config)?;
+        Ok(Self {
+            inner: Arc::new(Mutex::new(AgentEngine::new(config))),
+        })
+    }
+
+    #[napi]
+    pub async fn process_tick(&self) -> Result<String> {
+        let engine = self.inner.clone();
+        // Async processing в Tokio runtime
+        let result = tokio::task::spawn_blocking(move || {
+            let mut engine = engine.lock().unwrap();
+            engine.tick()
+        }).await?;
+
+        Ok(serde_json::to_string(&result)?)
+    }
+
+    #[napi(ts_return_type = "Promise<Float32Array>")]
+    pub fn get_embeddings(&self, text: String) -> Result<Vec<f32>> {
+        let engine = self.inner.lock().unwrap();
+        Ok(engine.compute_embeddings(&text))
+    }
+}
+```
+
+#### TypeScript Интерфейс
+
+```typescript
+// Автогенерированный из Rust
+export interface RustAgentEngine {
+  processTick(): Promise<string>
+  getEmbeddings(text: string): Promise<Float32Array>
+}
+
+// Использование в TypeScript
+import { RustAgentEngine } from './rust-bindings'
+
+class HybridEngine {
+  private rustEngine: RustAgentEngine
+  private jsComponents: Map<string, Component>
+
+  constructor(config: Config) {
+    // Критические компоненты в Rust
+    this.rustEngine = new RustAgentEngine(JSON.stringify(config))
+
+    // Некритические в TypeScript
+    this.jsComponents = new Map([
+      ['ui', new UIComponent()],
+      ['logging', new LoggingComponent()],
+    ])
+  }
+
+  async tick(): Promise<void> {
+    // Rust для вычислений
+    const state = await this.rustEngine.processTick()
+
+    // TypeScript для UI и I/O
+    await this.updateUI(JSON.parse(state))
+  }
+}
+```
+
+### 9.4 Метрики для Принятия Решений
+
+```rust
+#[derive(Debug)]
+pub struct OptimizationDecision {
+    pub component: String,
+    pub current_language: Language,
+    pub recommended_language: Language,
+    pub expected_speedup: f64,
+    pub implementation_cost_hours: u32,
+}
+
+impl OptimizationDecision {
+    pub fn analyze(metrics: &ComponentMetrics) -> Self {
+        let speedup = Self::estimate_rust_speedup(metrics);
+        let cost = Self::estimate_implementation_cost(metrics);
+
+        let recommended = if speedup > 2.0 && cost < 40 {
+            Language::Rust
+        } else if speedup > 1.5 && metrics.is_bottleneck {
+            Language::RustWasm
+        } else {
+            Language::TypeScript
+        };
+
+        Self {
+            component: metrics.name.clone(),
+            current_language: metrics.language,
+            recommended_language: recommended,
+            expected_speedup: speedup,
+            implementation_cost_hours: cost,
+        }
+    }
+}
+```
+
 ## Заключение
 
 Rust компоненты AURA обеспечивают:

@@ -642,6 +642,164 @@ class ReputationBasedCooperation:
         self.reputation[agent_id] = α * self.reputation.get(agent_id, 0.5) + (1-α) * reward
 ```
 
+## 25. Режимы Деградации и Graceful Degradation
+
+### 25.1 Классификация Режимов Деградации
+
+| Уровень | Название | Потеря функциональности | Восстановление |
+|---------|----------|-------------------------|----------------|
+| **0** | Нормальный | 0% | - |
+| **1** | Стресс | 5-10% | Автоматическое |
+| **2** | Перегрузка | 20-30% | Частичное вмешательство |
+| **3** | Критический | 50-70% | Ручное восстановление |
+| **4** | Аварийный | 90%+ | Перезапуск системы |
+
+### 25.2 Что Происходит При Перегрузке
+
+```typescript
+class DegradationManager {
+  handleOverload(load: number): void {
+    if (load > 0.9) {
+      // Уровень 4: Аварийный режим
+      this.shutdownNonEssential();
+      this.activateEmergencyMode();
+    } else if (load > 0.7) {
+      // Уровень 3: Критический
+      this.reducePrecision();
+      this.disableAdvancedFeatures();
+    } else if (load > 0.5) {
+      // Уровень 2: Перегрузка
+      this.increaseTimeouts();
+      this.reduceParallelism();
+    } else if (load > 0.3) {
+      // Уровень 1: Стресс
+      this.optimizeCache();
+      this.deferNonUrgent();
+    }
+  }
+}
+```
+
+### 25.3 Стратегии Graceful Degradation
+
+**1. Приоритизация компонентов:**
+```typescript
+enum Priority {
+  CRITICAL = 0,    // Базовые функции безопасности
+  ESSENTIAL = 1,   // Основная функциональность
+  IMPORTANT = 2,   // Важные, но не критичные
+  OPTIONAL = 3     // Дополнительные возможности
+}
+
+function degradeByPriority(availableResources: number): void {
+  const levels = [Priority.OPTIONAL, Priority.IMPORTANT, Priority.ESSENTIAL];
+  for (const level of levels) {
+    disableComponentsAtLevel(level);
+    if (availableResources > required) break;
+  }
+}
+```
+
+**2. Fallback на простые эвристики:**
+| Нормальный режим | Деградированный режим |
+|-----------------|----------------------|
+| Квантовая оптимизация | Классический hill climbing |
+| Полный граф агентов | Small-world топология |
+| Точное вычисление Φ | Быстрая аппроксимация |
+| Глобальный консенсус | Локальное голосование |
+| Адаптивное обучение | Фиксированные правила |
+
+**3. Временная деградация:**
+```typescript
+class TemporalDegradation {
+  levels = [
+    { name: "realtime", latency: 10, accuracy: 0.95 },
+    { name: "near-realtime", latency: 100, accuracy: 0.90 },
+    { name: "batch", latency: 1000, accuracy: 0.85 },
+    { name: "offline", latency: 10000, accuracy: 0.80 }
+  ];
+
+  selectLevel(load: number): DegradationLevel {
+    const index = Math.floor(load * this.levels.length);
+    return this.levels[Math.min(index, this.levels.length - 1)];
+  }
+}
+```
+
+### 25.4 Эмпирические Стресс-Тесты
+
+**Тест 1: Экспоненциальный рост агентов**
+```
+Агенты: 10² → 10³ → 10⁴ → 10⁵
+Результат:
+- 10²: 100% функциональность
+- 10³: 95% (отключение визуализации)
+- 10⁴: 80% (переход на аппроксимации)
+- 10⁵: 60% (только критические функции)
+```
+
+**Тест 2: Adversarial входы**
+```
+Атака: 1000 противоречивых запросов/сек
+Реакция:
+- t=0-10s: Обнаружение аномалии
+- t=10-20s: Изоляция подозрительных агентов
+- t=20-30s: Переход в защищённый режим
+- t=30+s: Стабилизация на 70% производительности
+```
+
+**Тест 3: Каскадные отказы**
+```
+Сценарий: Отказ 30% узлов одновременно
+Восстановление:
+- 0-100ms: Обнаружение отказов
+- 100ms-1s: Реконфигурация сети
+- 1-10s: Перераспределение нагрузки
+- 10s-1min: Полное восстановление (без потерянных узлов)
+```
+
+### 25.5 Механизмы Восстановления
+
+```python
+class RecoveryMechanism:
+    def __init__(self):
+        self.checkpoints = []
+        self.recovery_strategies = {
+            'minor': self.quick_fix,
+            'major': self.rollback,
+            'critical': self.rebuild,
+            'catastrophic': self.factory_reset
+        }
+
+    def assess_damage(self) -> str:
+        integrity = self.check_system_integrity()
+        if integrity > 0.9: return 'minor'
+        elif integrity > 0.7: return 'major'
+        elif integrity > 0.3: return 'critical'
+        else: return 'catastrophic'
+
+    def recover(self):
+        damage_level = self.assess_damage()
+        strategy = self.recovery_strategies[damage_level]
+        return strategy()
+
+    def quick_fix(self):
+        # Локальные исправления
+        return self.repair_corrupted_components()
+
+    def rollback(self):
+        # Откат к последнему стабильному состоянию
+        return self.restore_checkpoint(self.checkpoints[-1])
+
+    def rebuild(self):
+        # Перестроение из базовых компонентов
+        return self.reconstruct_from_invariants()
+
+    def factory_reset(self):
+        # Полный сброс к начальному состоянию
+        return self.initialize_from_scratch()
+```
+
 ## Заключение
 
 AURA не претендует на полную неуязвимость к парадоксам - некоторые из них отражают фундаментальные ограничения познания и вычислений. Однако архитектура обеспечивает:

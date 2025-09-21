@@ -4,12 +4,28 @@ import { readFile, writeFile, exists } from 'fs/promises';
 import { join, dirname } from 'path';
 
 /**
- * Скрипт для объединения всех файлов документации v0.3 в один файл
+ * Скрипт для объединения всех файлов документации AURA в один файл
  * согласно порядку, указанному в README.md
+ * Версия берётся из package.json
  */
 
 const V03_DIR = join(import.meta.dir, '..');
 const OUTPUT_FILE = join(import.meta.dir, '..', 'full.md');
+const PACKAGE_JSON_PATH = join(V03_DIR, 'package.json');
+
+/**
+ * Получает версию из package.json
+ */
+async function getVersion(): Promise<string> {
+  try {
+    const packageContent = await readFile(PACKAGE_JSON_PATH, 'utf-8');
+    const packageJson = JSON.parse(packageContent);
+    return packageJson.version || '0.0.0';
+  } catch (error) {
+    console.warn('⚠️  Не удалось прочитать версию из package.json, используется версия по умолчанию');
+    return '0.0.0';
+  }
+}
 
 // Порядок файлов согласно README.md
 const FILE_ORDER = [
@@ -33,6 +49,12 @@ const FILE_ORDER = [
   '10-typescript-architecture.md',
   '11-rust-components.md',
   '12-integration.md',
+  
+  // Часть V: Практическая Реализация
+  'minimal-viable-aura.md',
+  'pragmatic-tradeoffs.md',
+  'failure-modes.md',
+  'benchmarks-realistic.md',
   
   // Приложения
   'A-glossary.md',
@@ -106,7 +128,8 @@ function generateTableOfContents(files: FileInfo[]): string {
     { title: 'Часть II: Математическая Формализация', start: 3, end: 6 },
     { title: 'Часть III: Проблемный Анализ', start: 6, end: 9 },
     { title: 'Часть IV: Спецификация Реализации', start: 9, end: 13 },
-    { title: 'Приложения', start: 13, end: files.length }
+    { title: 'Часть V: Практическая Реализация', start: 13, end: 17 },
+    { title: 'Приложения', start: 17, end: files.length }
   ];
   
   let sectionIndex = 1;
@@ -128,11 +151,11 @@ function generateTableOfContents(files: FileInfo[]): string {
   return toc;
 }
 
-function generateHeader(): string {
+function generateHeader(version: string): string {
   return `# AURA: Адаптивная Унифицированная Резонансная Архитектура
-## Версия 0.3 - Полная Спецификация
+## Версия ${version} - Полная Спецификация
 
-*Этот документ объединяет все файлы спецификации AURA v0.3 в единый документ согласно порядку, указанному в README.md*
+*Этот документ объединяет все файлы спецификации AURA v${version} в единый документ согласно порядку, указанному в README.md*
 
 **Дата создания:** ${new Date().toLocaleDateString('ru-RU')}  
 **Автоматически сгенерировано скриптом merge-docs.ts**
@@ -143,7 +166,9 @@ function generateHeader(): string {
 }
 
 async function main() {
-  console.log('🚀 Начинаю объединение документации AURA v0.3...\n');
+  // Получаем версию из package.json
+  const version = await getVersion();
+  console.log(`🚀 Начинаю объединение документации AURA v${version}...\n`);
   
   // Читаем все файлы
   const files: FileInfo[] = [];
@@ -163,7 +188,7 @@ async function main() {
   console.log('\n📝 Создаю объединённый документ...');
   
   // Генерируем содержимое
-  let content = generateHeader();
+  let content = generateHeader(version);
   content += generateTableOfContents(files);
   content += '\n---\n\n';
   

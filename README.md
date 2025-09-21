@@ -23,6 +23,12 @@
 - **[11-rust-components.md](11-rust-components.md)** - Высокопроизводительные компоненты на Rust
 - **[12-integration.md](12-integration.md)** - Спецификация интеграции компонентов
 
+### Часть V: Практическая Реализация
+- **[minimal-viable-aura.md](minimal-viable-aura.md)** - Минимальный жизнеспособный прототип
+- **[pragmatic-tradeoffs.md](pragmatic-tradeoffs.md)** - Матрица инженерных компромиссов
+- **[failure-modes.md](failure-modes.md)** - Режимы отказа и восстановления
+- **[benchmarks-realistic.md](benchmarks-realistic.md)** - Реалистичные бенчмарки и сравнения
+
 ### Приложения
 - **[A-glossary.md](A-glossary.md)** - Глоссарий терминов и обозначений
 - **[B-proofs.md](B-proofs.md)** - Полные математические доказательства
@@ -48,15 +54,18 @@ AURA представляет собой синтез лучших идей из
 4. [B-proofs.md](B-proofs.md) - строгие доказательства
 
 ### Для практиков
-1. [09-implementation-roadmap.md](09-implementation-roadmap.md) - план реализации
-2. [10-typescript-architecture.md](10-typescript-architecture.md) - архитектура TypeScript
-3. [11-rust-components.md](11-rust-components.md) - компоненты Rust
-4. [C-benchmarks.md](C-benchmarks.md) - метрики и тесты
+1. [minimal-viable-aura.md](minimal-viable-aura.md) - начните с минимального прототипа
+2. [pragmatic-tradeoffs.md](pragmatic-tradeoffs.md) - поймите компромиссы
+3. [09-implementation-roadmap.md](09-implementation-roadmap.md) - план реализации
+4. [10-typescript-architecture.md](10-typescript-architecture.md) - архитектура TypeScript
+5. [11-rust-components.md](11-rust-components.md) - компоненты Rust
+6. [benchmarks-realistic.md](benchmarks-realistic.md) - реальные бенчмарки
 
 ### Для исследователей безопасности
 1. [06-problem-space.md](06-problem-space.md) - фундаментальные проблемы
 2. [07-resilience-analysis.md](07-resilience-analysis.md) - анализ устойчивости
 3. [08-safety-guarantees.md](08-safety-guarantees.md) - гарантии безопасности
+4. [failure-modes.md](failure-modes.md) - режимы отказа и восстановление
 
 ### Справочные материалы
 - [A-glossary.md](A-glossary.md) - все термины и обозначения
