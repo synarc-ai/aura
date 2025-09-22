@@ -1,9 +1,9 @@
 # AURA: Адаптивная Унифицированная Резонансная Архитектура
-## Версия 0.5.0 - Полная Спецификация
+## Версия 0.0.0 - Полная Спецификация
 
-*Этот документ объединяет все файлы спецификации AURA v0.5.0 в единый документ согласно порядку, указанному в README.md*
+*Этот документ объединяет все файлы спецификации AURA v0.0.0 в единый документ согласно порядку, указанному в README.md*
 
-**Дата создания:** 22.09.2025  
+**Дата создания:** 23.09.2025  
 **Автоматически сгенерировано скриптом merge-docs.ts**
 
 ---
@@ -303,7 +303,7 @@ AURA преодолевает традиционный дуализм между
 
 ### 12.1 Trade-off между Общностью и Эффективностью
 
-AURA признает фундаментальную дилемму инженерии AGI, описанную в analytics-01.md:
+AURA признает фундаментальную дилемму инженерии AGI:
 
 **Теорема об отсутствии бесплатного обеда применительно к AGI:**
 Невозможно создать систему, одновременно:
@@ -349,15 +349,24 @@ AURA учится на примерах успешных систем:
 
 Для каждого архитектурного решения вычисляем:
 
-```python
-def compromise_score(solution):
+```typescript
+interface CompromiseScore {
+    theoretical_power: number;           // 0.0-1.0, насколько близко к идеалу
+    practical_speed: number;             // ops/sec, реальная производительность
+    resource_cost: number;               // $/hour, стоимость вычислений
+    implementation_complexity: number;   // LOC, строки кода
+    debug_difficulty: number;            // 0.0-1.0, сложность отладки
+}
+
+function compromiseScore(solution: any): CompromiseScore {
     return {
-        'theoretical_power': 0.0-1.0,    # Насколько близко к идеалу
-        'practical_speed': ops/sec,       # Реальная производительность
-        'resource_cost': $/hour,          # Стоимость вычислений
-        'implementation_complexity': LOC, # Строки кода
-        'debug_difficulty': 0.0-1.0      # Сложность отладки
-    }
+        theoretical_power: 0.0,          // Насколько близко к идеалу
+        practical_speed: 0,              // Реальная производительность
+        resource_cost: 0,                // Стоимость вычислений
+        implementation_complexity: 0,    // Строки кода
+        debug_difficulty: 0.0            // Сложность отладки
+    };
+}
 ```
 
 **Правило принятия решений:**
@@ -542,6 +551,7 @@ AURA, как любая вычислительная система, огран�
 - Пример: связывание с известными теориями за 10-60 с
 
 **Восходящий поток**: символы → слова → предложения → идеи → теории
+
 **Нисходящий поток**: контекст квантовой физики → ожидание терминов → предсказание следующих слов
 
 ### 1.4 Вычислительная Сложность и Практические Аппроксимации
@@ -596,7 +606,7 @@ class HierarchicalLevel {
 - Градуальную деградацию при частичных отказах
 - Способность к восстановлению через перераспределение
 
-### 2.3 Холографический Принцип
+### 2.3 Голографический Принцип
 
 Каждая часть системы содержит информацию о целом, хотя и с меньшей детализацией. Это позволяет:
 - Восстанавливать целое по части
@@ -2399,30 +2409,48 @@ function discreteRandomWalk(
 
 #### 11.3.2 Масштабирование Системы
 
-```python
-def estimate_performance(config):
+```typescript
+interface PerformanceConfig {
+    agents_per_level: number;
+    hierarchy_levels: number;
+}
+
+interface PerformanceEstimate {
+    time_per_step_ms: number;
+    max_fps: number;
+    memory_mb: number;
+    max_agents: number;
+}
+
+function estimatePerformance(config: PerformanceConfig, availableMemory: number): PerformanceEstimate {
     """Оценка производительности для конфигурации"""
 
-    n_agents = config['agents_per_level']
-    n_levels = config['hierarchy_levels']
+    const nAgents = config.agents_per_level;
+    const nLevels = config.hierarchy_levels;
 
-    # Время на один шаг симуляции (мс)
-    agent_update = 0.01 * n_agents  # Параллельно на GPU
-    consensus = 0.1 * n_agents * np.log(n_agents)
-    inter_level = 0.05 * n_levels * np.sqrt(n_agents)
+    // Время на один шаг симуляции (мс)
+    const agentUpdate = 0.01 * nAgents;  // Параллельно на GPU
+    const consensus = 0.1 * nAgents * Math.log(nAgents);
+    const interLevel = 0.05 * nLevels * Math.sqrt(nAgents);
 
-    total_ms = agent_update + consensus + inter_level
+    const totalMs = agentUpdate + consensus + interLevel;
 
-    # Память (МБ)
-    agent_memory = n_agents * n_levels * 0.001  # 1KB per agent
-    connection_memory = n_agents * 100 * 8 / 1e6  # Разреженная матрица
+    // Память (МБ)
+    const agentMemory = nAgents * nLevels * 0.001;  // 1KB per agent
+    const connectionMemory = nAgents * 100 * 8 / 1e6;  // Разреженная матрица
 
     return {
-        'time_per_step_ms': total_ms,
-        'max_fps': 1000 / total_ms,
-        'memory_mb': agent_memory + connection_memory,
-        'max_agents': estimate_max_agents(available_memory)
-    }
+        time_per_step_ms: totalMs,
+        max_fps: 1000 / totalMs,
+        memory_mb: agentMemory + connectionMemory,
+        max_agents: estimateMaxAgents(availableMemory)
+    };
+}
+
+function estimateMaxAgents(availableMemory: number): number {
+    // Простая оценка максимального количества агентов
+    return Math.floor(availableMemory * 1000);  // Примерная формула
+}
 ```
 
 **Практические ограничения:**
@@ -2475,27 +2503,43 @@ __global__ void updateAgents(
 
 #### 11.4.2 Распределённая Архитектура
 
-```python
-# MPI-based распределённая симуляция
-def distributed_step(comm, local_agents, level):
-    rank = comm.Get_rank()
-    size = comm.Get_size()
+```typescript
+// MPI-based распределённая симуляция
+interface MPIComm {
+    getRank(): number;
+    getSize(): number;
+    allreduce<T>(localValue: T, op: string): T;
+}
 
-    # 1. Локальное обновление агентов
-    local_outputs = update_agents_local(local_agents)
+interface Level {
+    requiresConsensus(): boolean;
+}
 
-    # 2. Обмен граничными значениями
-    ghost_zones = exchange_boundaries(comm, local_outputs)
+interface Agent {
+    // Определения агента
+}
 
-    # 3. Глобальная редукция для консенсуса
-    if level.requires_consensus():
-        local_consensus = compute_local_consensus(local_outputs)
-        global_consensus = comm.allreduce(local_consensus, op=MPI.SUM)
-        apply_consensus(local_agents, global_consensus)
+function distributedStep(comm: MPIComm, localAgents: Agent[], level: Level): void {
+    const rank = comm.getRank();
+    const size = comm.getSize();
 
-    # 4. Асинхронная межуровневая коммуникация
-    if rank == 0:  # Master координирует уровни
-        coordinate_levels(comm, level)
+    // 1. Локальное обновление агентов
+    const localOutputs = updateAgentsLocal(localAgents);
+
+    // 2. Обмен граничными значениями
+    const ghostZones = exchangeBoundaries(comm, localOutputs);
+
+    // 3. Глобальная редукция для консенсуса
+    if (level.requiresConsensus()) {
+        const localConsensus = computeLocalConsensus(localOutputs);
+        const globalConsensus = comm.allreduce(localConsensus, 'SUM');
+        applyConsensus(localAgents, globalConsensus);
+    }
+
+    // 4. Асинхронная межуровневая коммуникация
+    if (rank === 0) {  // Master координирует уровни
+        coordinateLevels(comm, level);
+    }
 
     return local_outputs
 ```
@@ -3061,20 +3105,35 @@ class ClassicalSuperposition {
 **Что это:** Использование реальных квантовых процессоров (QPU).
 
 **Потенциальное применение в AURA:**
-```python
-# Требует квантового железа (IBM Q, Google Sycamore и т.д.)
-from qiskit import QuantumCircuit, execute, IBMQ
+```typescript
+// Требует квантового железа (IBM Q, Google Sycamore и т.д.)
+import { QuantumCircuit, execute, IBMQ } from 'qiskit-js';  // Гипотетический TypeScript SDK
 
-def quantum_pattern_search(data):
-    circuit = QuantumCircuit(n_qubits)
-    # Подготовка суперпозиции
-    circuit.h(range(n_qubits))
-    # Квантовый оракул
-    circuit.append(oracle(data))
-    # Амплификация амплитуды
-    circuit.append(grover_operator())
-    # Измерение
-    return execute(circuit, backend=IBMQ.get_backend('ibmq_qasm_simulator'))
+interface QuantumData {
+    // Структура данных для квантовых операций
+}
+
+async function quantumPatternSearch(data: QuantumData, nQubits: number): Promise<any> {
+    const circuit = new QuantumCircuit(nQubits);
+    // Подготовка суперпозиции
+    circuit.h(Array.from({ length: nQubits }, (_, i) => i));
+    // Квантовый оракул
+    circuit.append(oracle(data));
+    // Амплификация амплитуды
+    circuit.append(groverOperator());
+    // Измерение
+    return await execute(circuit, { backend: IBMQ.getBackend('ibmq_qasm_simulator') });
+}
+
+function oracle(data: QuantumData): any {
+    // Реализация квантового оракула
+    return null;
+}
+
+function groverOperator(): any {
+    // Реализация оператора Гровера
+    return null;
+}
 ```
 
 **Реальные преимущества:**
@@ -4611,74 +4670,208 @@ Competence(level) = {
 
 ### 22.1 Общий Алгоритм Обнаружения
 
-```python
-def DetectParadox(state, context):
-    # 1. Проверка логической согласованности
-    if CheckConsistency(state) == False:
-        return ParadoxType.LOGICAL
+```typescript
+enum ParadoxType {
+    LOGICAL = 'LOGICAL',
+    CAUSAL = 'CAUSAL',
+    SELF_REFERENCE = 'SELF_REFERENCE',
+    RESOURCE = 'RESOURCE',
+    TEMPORAL = 'TEMPORAL'
+}
 
-    # 2. Проверка каузальных циклов
-    if DetectCausalLoop(state.causal_graph):
-        return ParadoxType.CAUSAL
+interface State {
+    causal_graph: any;
+    description: string;
+    // другие свойства
+}
 
-    # 3. Проверка самореференции
-    if ContainsSelfReference(state.description):
-        return ParadoxType.SELF_REFERENCE
+function detectParadox(state: State, context: any): ParadoxType | null {
+    // 1. Проверка логической согласованности
+    if (checkConsistency(state) === false) {
+        return ParadoxType.LOGICAL;
+    }
 
-    # 4. Проверка ресурсных ограничений
-    if ResourceRequirement(state) == INFINITE:
-        return ParadoxType.RESOURCE
+    // 2. Проверка каузальных циклов
+    if (detectCausalLoop(state.causal_graph)) {
+        return ParadoxType.CAUSAL;
+    }
 
-    return None
+    // 3. Проверка самореференции
+    if (containsSelfReference(state.description)) {
+        return ParadoxType.SELF_REFERENCE;
+    }
+
+    // 4. Проверка ресурсных ограничений
+    if (resourceRequirement(state) === 'INFINITE') {
+        return ParadoxType.RESOURCE;
+    }
+
+    return null;
+}
+
+function checkConsistency(state: State): boolean {
+    // Реализация проверки
+    return true;
+}
+
+function detectCausalLoop(causalGraph: any): boolean {
+    // Реализация обнаружения цикла
+    return false;
+}
+
+function containsSelfReference(description: string): boolean {
+    // Реализация проверки
+    return false;
+}
+
+function resourceRequirement(state: State): string {
+    // Реализация оценки ресурсов
+    return 'FINITE';
+}
 ```
 
 ### 22.2 Механизм Разрешения
 
-```python
-def ResolveParadox(paradox_type, state):
-    resolution_strategies = {
-        ParadoxType.LOGICAL: ApplyParaconsistentLogic,
-        ParadoxType.CAUSAL: BreakCausalLoop,
-        ParadoxType.SELF_REFERENCE: IntroduceTypeHierarchy,
-        ParadoxType.RESOURCE: ApplyResourceBounds,
-        ParadoxType.TEMPORAL: EnforceTimelineConsistency
-    }
+```typescript
+type ResolutionStrategy = (state: State) => any;
 
-    strategy = resolution_strategies.get(paradox_type)
-    if strategy:
-        return strategy(state)
-    else:
-        return IsolateAndContain(state)
+function resolveParadox(paradoxType: ParadoxType, state: State): any {
+    const resolutionStrategies: Record<ParadoxType, ResolutionStrategy> = {
+        [ParadoxType.LOGICAL]: applyParaconsistentLogic,
+        [ParadoxType.CAUSAL]: breakCausalLoop,
+        [ParadoxType.SELF_REFERENCE]: introduceTypeHierarchy,
+        [ParadoxType.RESOURCE]: applyResourceBounds,
+        [ParadoxType.TEMPORAL]: enforceTimelineConsistency
+    };
+
+    const strategy = resolutionStrategies[paradoxType];
+    if (strategy) {
+        return strategy(state);
+    } else {
+        return isolateAndContain(state);
+    }
+}
+
+function applyParaconsistentLogic(state: State): any {
+    // Реализация
+    return null;
+}
+
+function breakCausalLoop(state: State): any {
+    // Реализация
+    return null;
+}
+
+function introduceTypeHierarchy(state: State): any {
+    // Реализация
+    return null;
+}
+
+function applyResourceBounds(state: State): any {
+    // Реализация
+    return null;
+}
+
+function enforceTimelineConsistency(state: State): any {
+    // Реализация
+    return null;
+}
+
+function isolateAndContain(state: State): any {
+    // Реализация
+    return null;
+}
 ```
 
 ### 22.3 Превентивные Меры
 
-```python
-class ParadoxPrevention:
-    def __init__(self):
-        self.invariants = [
-            ConsistencyInvariant(),
-            CausalityInvariant(),
-            ResourceBoundInvariant(),
-            TypeSafetyInvariant()
-        ]
+```typescript
+interface Invariant {
+    check(state: State): boolean;
+    violationType: string;
+}
 
-    def ValidateAction(self, action, state):
-        future_state = Simulate(action, state)
+class ConsistencyInvariant implements Invariant {
+    violationType = 'consistency';
+    check(state: State): boolean {
+        // Реализация
+        return true;
+    }
+}
 
-        for invariant in self.invariants:
-            if not invariant.check(future_state):
-                return False, invariant.violation_type
+class CausalityInvariant implements Invariant {
+    violationType = 'causality';
+    check(state: State): boolean {
+        // Реализация
+        return true;
+    }
+}
 
-        return True, None
+class ResourceBoundInvariant implements Invariant {
+    violationType = 'resource_bound';
+    check(state: State): boolean {
+        // Реализация
+        return true;
+    }
+}
 
-    def SafeExecute(self, action, state):
-        valid, violation = self.ValidateAction(action, state)
+class TypeSafetyInvariant implements Invariant {
+    violationType = 'type_safety';
+    check(state: State): boolean {
+        // Реализация
+        return true;
+    }
+}
 
-        if valid:
-            return Execute(action, state)
-        else:
-            return HandleViolation(violation, action, state)
+class ParadoxPrevention {
+    private invariants: Invariant[];
+
+    constructor() {
+        this.invariants = [
+            new ConsistencyInvariant(),
+            new CausalityInvariant(),
+            new ResourceBoundInvariant(),
+            new TypeSafetyInvariant()
+        ];
+    }
+
+    validateAction(action: any, state: State): [boolean, string | null] {
+        const futureState = simulate(action, state);
+
+        for (const invariant of this.invariants) {
+            if (!invariant.check(futureState)) {
+                return [false, invariant.violationType];
+            }
+        }
+
+        return [true, null];
+    }
+
+    safeExecute(action: any, state: State): any {
+        const [valid, violation] = this.validateAction(action, state);
+
+        if (valid) {
+            return execute(action, state);
+        } else {
+            return handleViolation(violation, action, state);
+        }
+    }
+}
+
+function simulate(action: any, state: State): State {
+    // Реализация симуляции
+    return state;
+}
+
+function execute(action: any, state: State): any {
+    // Реализация выполнения
+    return null;
+}
+
+function handleViolation(violation: string | null, action: any, state: State): any {
+    // Обработка нарушения
+    return null;
+}
 ```
 
 ## Обобщённые Принципы Устойчивости
@@ -4792,24 +4985,47 @@ Coherence(t) = Tr(ρ^2(t)) ≥ Coherence_min > 0
 **Проблема**: Максимизация CPS приводит к созданию clickbait.
 
 **Решение AURA**:
-```python
-def ResolveGoodhart():
-    # Многокритериальная оптимизация
-    metrics = [
+```typescript
+function resolveGoodhart(history: any[], context: any): any {
+    // Многокритериальная оптимизация
+    const metrics = [
         'clicks_per_second',
         'user_satisfaction',
         'information_quality',
         'long_term_engagement'
-    ]
+    ];
 
-    # Динамические веса
-    weights = AdaptiveWeights(history, context)
+    // Динамические веса
+    const weights = adaptiveWeights(history, context);
 
-    # Шум для предотвращения переоптимизации
-    for metric in metrics:
-        metric_value += noise(σ=0.1)
+    // Шум для предотвращения переоптимизации
+    const noisyMetrics = metrics.map(metric => {
+        const metricValue = getMetricValue(metric);
+        return metricValue + noise(0.1);
+    });
 
-    return ParetOptimal(metrics, weights)
+    return paretoOptimal(noisyMetrics, weights);
+}
+
+function adaptiveWeights(history: any[], context: any): number[] {
+    // Реализация адаптивных весов
+    return [0.25, 0.25, 0.25, 0.25];
+}
+
+function noise(sigma: number): number {
+    // Генерация шума
+    return (Math.random() - 0.5) * 2 * sigma;
+}
+
+function getMetricValue(metric: string): number {
+    // Получение значения метрики
+    return 0;
+}
+
+function paretoOptimal(metrics: number[], weights: number[]): any {
+    // Реализация Pareto оптимальности
+    return null;
+}
 ```
 
 ### 24.2 Пример: Дилемма Заключённого в Мультиагентной Системе
@@ -4817,28 +5033,44 @@ def ResolveGoodhart():
 **Сценарий**: Несколько агентов AURA должны выбрать: сотрудничать или предать.
 
 **Решение**:
-```python
-class ReputationBasedCooperation:
-    def __init__(self):
-        self.reputation = {}
-        self.threshold = 0.6
+```typescript
+enum Action {
+    COOPERATE = 'COOPERATE',
+    DEFECT = 'DEFECT'
+}
 
-    def decide(self, agent_id, history):
-        # Обновляем репутацию
-        self.update_reputation(agent_id, history)
+class ReputationBasedCooperation {
+    private reputation: Map<string, number>;
+    private threshold: number;
 
-        # Стратегия TIT-FOR-TAT с прощением
-        if self.reputation[agent_id] > self.threshold:
-            return COOPERATE
-        elif random() < 0.1:  # 10% шанс прощения
-            return COOPERATE
-        else:
-            return DEFECT
+    constructor() {
+        this.reputation = new Map();
+        this.threshold = 0.6;
+    }
 
-    def update_reputation(self, agent_id, action):
-        α = 0.9  # фактор забывания
-        reward = 1 if action == COOPERATE else -1
-        self.reputation[agent_id] = α * self.reputation.get(agent_id, 0.5) + (1-α) * reward
+    decide(agentId: string, history: any[]): Action {
+        // Обновляем репутацию
+        this.updateReputation(agentId, history);
+
+        // Стратегия TIT-FOR-TAT с прощением
+        const agentReputation = this.reputation.get(agentId) || 0.5;
+
+        if (agentReputation > this.threshold) {
+            return Action.COOPERATE;
+        } else if (Math.random() < 0.1) {  // 10% шанс прощения
+            return Action.COOPERATE;
+        } else {
+            return Action.DEFECT;
+        }
+    }
+
+    updateReputation(agentId: string, action: Action): void {
+        const alpha = 0.9;  // фактор забывания
+        const reward = action === Action.COOPERATE ? 1 : -1;
+        const currentRep = this.reputation.get(agentId) || 0.5;
+        this.reputation.set(agentId, alpha * currentRep + (1 - alpha) * reward);
+    }
+}
 ```
 
 ## 25. Режимы Деградации и Graceful Degradation
@@ -4959,32 +5191,83 @@ class TemporalDegradation {
 
 ### 25.5 Механизмы Восстановления
 
-```python
-class RecoveryMechanism:
-    def __init__(self):
-        self.checkpoints = []
-        self.recovery_strategies = {
-            'minor': self.quick_fix,
-            'major': self.rollback,
-            'critical': self.rebuild,
-            'catastrophic': self.factory_reset
-        }
+```typescript
+type DamageLevel = 'minor' | 'major' | 'critical' | 'catastrophic';
+type RecoveryStrategy = () => any;
 
-    def assess_damage(self) -> str:
-        integrity = self.check_system_integrity()
-        if integrity > 0.9: return 'minor'
-        elif integrity > 0.7: return 'major'
-        elif integrity > 0.3: return 'critical'
-        else: return 'catastrophic'
+class RecoveryMechanism {
+    private checkpoints: any[];
+    private recoveryStrategies: Record<DamageLevel, RecoveryStrategy>;
 
-    def recover(self):
-        damage_level = self.assess_damage()
-        strategy = self.recovery_strategies[damage_level]
-        return strategy()
+    constructor() {
+        this.checkpoints = [];
+        this.recoveryStrategies = {
+            'minor': () => this.quickFix(),
+            'major': () => this.rollback(),
+            'critical': () => this.rebuild(),
+            'catastrophic': () => this.factoryReset()
+        };
+    }
 
-    def quick_fix(self):
-        # Локальные исправления
-        return self.repair_corrupted_components()
+    assessDamage(): DamageLevel {
+        const integrity = this.checkSystemIntegrity();
+        if (integrity > 0.9) return 'minor';
+        else if (integrity > 0.7) return 'major';
+        else if (integrity > 0.3) return 'critical';
+        else return 'catastrophic';
+    }
+
+    recover(): any {
+        const damageLevel = this.assessDamage();
+        const strategy = this.recoveryStrategies[damageLevel];
+        return strategy();
+    }
+
+    quickFix(): any {
+        // Локальные исправления
+        return this.repairCorruptedComponents();
+    }
+
+    private checkSystemIntegrity(): number {
+        // Реализация проверки целостности
+        return 1.0;
+    }
+
+    private rollback(): any {
+        // Откат к предыдущей версии
+        return this.restoreCheckpoint(this.checkpoints[this.checkpoints.length - 1]);
+    }
+
+    private rebuild(): any {
+        // Перестройка системы
+        return this.reconstructFromInvariants();
+    }
+
+    private factoryReset(): any {
+        // Сброс к заводским настройкам
+        return this.initializeFromScratch();
+    }
+
+    private repairCorruptedComponents(): any {
+        // Восстановление повреждённых компонентов
+        return null;
+    }
+
+    private restoreCheckpoint(checkpoint: any): any {
+        // Восстановление из checkpoint
+        return null;
+    }
+
+    private reconstructFromInvariants(): any {
+        // Перестроение из инвариантов
+        return null;
+    }
+
+    private initializeFromScratch(): any {
+        // Инициализация с нуля
+        return null;
+    }
+}
 
     def rollback(self):
         # Откат к последнему стабильному состоянию
@@ -5506,169 +5789,278 @@ E(t) = ⟨ψ(t)|H|ψ(t)⟩ ≤ E_max ∀t
 
 ### 14.1 Архитектура Системы Мониторинга
 
-```python
-class SafetyMonitoringSystem:
-    def __init__(self):
-        self.sensors = {
-            'resource': ResourceMonitor(),
-            'behavior': BehaviorAnalyzer(),
-            'integrity': IntegrityChecker(),
-            'causality': CausalityTracker()
+```typescript
+class SafetyMonitoringSystem {
+    private sensors: Record<string, any>;
+    private detectors: Record<string, any>;
+    private response: SafetyResponseUnit;
+    private log: AuditLogger;
+
+    constructor() {
+        this.sensors = {
+            'resource': new ResourceMonitor(),
+            'behavior': new BehaviorAnalyzer(),
+            'integrity': new IntegrityChecker(),
+            'causality': new CausalityTracker()
+        };
+
+        this.detectors = {
+            'anomaly': new AnomalyDetector(),
+            'attack': new AttackDetector(),
+            'drift': new DriftDetector(),
+            'paradox': new ParadoxDetector()
+        };
+
+        this.response = new SafetyResponseUnit();
+        this.log = new AuditLogger();
+    }
+
+    monitor(state: any, dt: number = 0.001): any[] {
+        /**
+         * Основной цикл мониторинга
+         * dt: временной шаг в секундах (1 мс по умолчанию)
+         */
+        // Сбор данных
+        const sensorData = this.collectSensorData(state);
+
+        // Анализ
+        const threats = this.analyzeThreats(sensorData);
+
+        // Ответ
+        if (threats.length > 0) {
+            this.response.handle(threats, state);
         }
 
-        self.detectors = {
-            'anomaly': AnomalyDetector(),
-            'attack': AttackDetector(),
-            'drift': DriftDetector(),
-            'paradox': ParadoxDetector()
-        }
+        // Логирование
+        this.log.record(sensorData, threats);
 
-        self.response = SafetyResponseUnit()
-        self.log = AuditLogger()
-
-    def monitor(self, state, dt=0.001):
-        """
-        Основной цикл мониторинга
-        dt: временной шаг в секундах (1 мс по умолчанию)
-        """
-        # Сбор данных
-        sensor_data = self.collect_sensor_data(state)
-
-        # Анализ
-        threats = self.analyze_threats(sensor_data)
-
-        # Ответ
-        if threats:
-            self.response.handle(threats, state)
-
-        # Логирование
-        self.log.record(sensor_data, threats)
-
-        return threats
+        return threats;
+    }
+}
 ```
 
 ### 14.2 Детектор Аномалий
 
-```python
-class AnomalyDetector:
-    def __init__(self, window_size=1000):
-        self.window_size = window_size
-        self.history = deque(maxlen=window_size)
-        self.model = IsolationForest(contamination=0.01)
-        self.threshold = 3.5  # стандартных отклонений
+```typescript
+class AnomalyDetector {
+    private windowSize: number;
+    private history: number[][];
+    private model: IsolationForest;
+    private threshold: number; // стандартных отклонений
 
-    def detect(self, features):
-        """
-        Обнаружение аномалий в режиме реального времени
-        """
-        self.history.append(features)
+    constructor(windowSize: number = 1000) {
+        this.windowSize = windowSize;
+        this.history = [];
+        this.model = new IsolationForest({ contamination: 0.01 });
+        this.threshold = 3.5;
+    }
 
-        if len(self.history) < 100:
-            return None  # Недостаточно данных
+    detect(features: number[]): any | null {
+        /**
+         * Обнаружение аномалий в режиме реального времени
+         */
+        this.history.push(features);
+        if (this.history.length > this.windowSize) {
+            this.history.shift();
+        }
 
-        # Z-score для быстрого обнаружения
-        mean = np.mean(self.history, axis=0)
-        std = np.std(self.history, axis=0)
-        z_score = np.abs((features - mean) / (std + 1e-10))
+        if (this.history.length < 100) {
+            return null;  // Недостаточно данных
+        }
 
-        if np.any(z_score > self.threshold):
+        // Z-score для быстрого обнаружения
+        const mean = this.calculateMean(this.history);
+        const std = this.calculateStd(this.history, mean);
+        const zScore = features.map((f, i) =>
+            Math.abs((f - mean[i]) / (std[i] + 1e-10))
+        );
+
+        if (zScore.some(z => z > this.threshold)) {
             return {
-                'type': 'statistical',
-                'severity': np.max(z_score) / self.threshold,
-                'features': features,
-                'z_scores': z_score
-            }
+                type: 'statistical',
+                severity: Math.max(...zScore) / this.threshold,
+                features: features,
+                z_scores: zScore
+            };
+        }
 
-        # Machine learning для сложных паттернов
-        if len(self.history) == self.window_size:
-            self.model.fit(self.history)
-            anomaly_score = self.model.decision_function([features])[0]
+        // Machine learning для сложных паттернов
+        if (this.history.length === this.windowSize) {
+            this.model.fit(this.history);
+            const anomalyScore = this.model.decisionFunction([features])[0];
 
-            if anomaly_score < -0.5:
+            if (anomalyScore < -0.5) {
                 return {
-                    'type': 'pattern',
-                    'severity': abs(anomaly_score),
-                    'features': features
-                }
+                    type: 'pattern',
+                    severity: Math.abs(anomalyScore),
+                    features: features
+                };
+            }
+        }
 
-        return None
+        return null;
+    }
+
+    private calculateMean(data: number[][]): number[] {
+        const featureCount = data[0].length;
+        const means = new Array(featureCount).fill(0);
+
+        for (const row of data) {
+            for (let i = 0; i < featureCount; i++) {
+                means[i] += row[i];
+            }
+        }
+
+        return means.map(sum => sum / data.length);
+    }
+
+    private calculateStd(data: number[][], means: number[]): number[] {
+        const featureCount = data[0].length;
+        const variances = new Array(featureCount).fill(0);
+
+        for (const row of data) {
+            for (let i = 0; i < featureCount; i++) {
+                variances[i] += Math.pow(row[i] - means[i], 2);
+            }
+        }
+
+        return variances.map(variance => Math.sqrt(variance / data.length));
+    }
+}
 ```
 
 ### 14.3 Модуль Быстрого Реагирования
 
-```python
-class SafetyResponseUnit:
-    def __init__(self):
-        self.response_time_target = 0.010  # 10 мс
-        self.strategies = {
-            'low': self.minimal_intervention,
-            'medium': self.moderate_intervention,
-            'high': self.aggressive_intervention,
-            'critical': self.emergency_shutdown
+```typescript
+class SafetyResponseUnit {
+    private responseTimeTarget: number; // 10 мс
+    private strategies: Record<string, (threat: any, state: any) => Promise<any>>;
+
+    constructor() {
+        this.responseTimeTarget = 0.010;
+        this.strategies = {
+            'low': this.minimalIntervention.bind(this),
+            'medium': this.moderateIntervention.bind(this),
+            'high': this.aggressiveIntervention.bind(this),
+            'critical': this.emergencyShutdown.bind(this)
+        };
+    }
+
+    async handle(threat: any, state: any, maxTime: number = 0.010): Promise<any> {
+        /**
+         * Обработка угрозы с гарантированным временем ответа
+         */
+        const startTime = performance.now();
+
+        const severity = this.assessSeverity(threat);
+        const strategy = this.selectStrategy(severity, maxTime);
+
+        // Параллельное выполнение мер
+        const promises = [
+            this.isolateThreat(threat),
+            this.backupState(state),
+            this.notifyOperators(threat),
+            strategy(threat, state)
+        ];
+
+        // Ожидание с таймаутом
+        const results = await Promise.allSettled(
+            promises.map(p =>
+                Promise.race([
+                    p,
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Timeout')), maxTime * 1000)
+                    )
+                ])
+            )
+        );
+
+        const responseTime = (performance.now() - startTime) / 1000;
+
+        if (responseTime > maxTime) {
+            await this.emergencyShutdown(threat, state);
         }
-
-    def handle(self, threat, state, max_time=0.010):
-        """
-        Обработка угрозы с гарантированным временем ответа
-        """
-        start_time = time.perf_counter()
-
-        severity = self.assess_severity(threat)
-        strategy = self.select_strategy(severity, max_time)
-
-        # Параллельное выполнение мер
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = [
-                executor.submit(self.isolate_threat, threat),
-                executor.submit(self.backup_state, state),
-                executor.submit(self.notify_operators, threat),
-                executor.submit(strategy, threat, state)
-            ]
-
-            # Ожидание с таймаутом
-            done, not_done = wait(futures, timeout=max_time)
-
-            # Отмена незавершённых задач
-            for future in not_done:
-                future.cancel()
-
-        response_time = time.perf_counter() - start_time
-
-        if response_time > max_time:
-            self.emergency_shutdown(threat, state)
 
         return {
-            'response_time': response_time,
-            'actions_taken': [f.result() for f in done if not f.cancelled()],
-            'threat_contained': self.verify_containment(threat, state)
+            response_time: responseTime,
+            actions_taken: results.filter(r => r.status === 'fulfilled').map(r => (r as PromiseFulfilledResult<any>).value),
+            threat_contained: await this.verifyContainment(threat, state)
+        };
+    }
+
+    private assessSeverity(threat: any): string {
+        /**
+         * Оценка серьёзности угрозы
+         */
+        const factors = {
+            impact: threat.potential_impact || 0,
+            likelihood: threat.likelihood || 0,
+            speed: threat.propagation_speed || 0,
+            reversibility: 1 - (threat.reversibility || 1)
+        };
+
+        const severityScore = (
+            factors.impact * 0.4 +
+            factors.likelihood * 0.2 +
+            factors.speed * 0.2 +
+            factors.reversibility * 0.2
+        );
+
+        if (severityScore > 0.8) {
+            return 'critical';
+        } else if (severityScore > 0.6) {
+            return 'high';
+        } else if (severityScore > 0.3) {
+            return 'medium';
+        } else {
+            return 'low';
         }
+    }
 
-    def assess_severity(self, threat):
-        """
-        Оценка серьёзности угрозы
-        """
-        factors = {
-            'impact': threat.get('potential_impact', 0),
-            'likelihood': threat.get('likelihood', 0),
-            'speed': threat.get('propagation_speed', 0),
-            'reversibility': 1 - threat.get('reversibility', 1)
-        }
+    private selectStrategy(severity: string, maxTime: number): (threat: any, state: any) => Promise<any> {
+        return this.strategies[severity];
+    }
 
-        severity_score = (
-            factors['impact'] * 0.4 +
-            factors['likelihood'] * 0.2 +
-            factors['speed'] * 0.2 +
-            factors['reversibility'] * 0.2
-        )
+    private async minimalIntervention(threat: any, state: any): Promise<any> {
+        // Минимальное вмешательство
+        return { action: 'minimal', threat, state };
+    }
 
-        if severity_score > 0.8:
-            return 'critical'
-        elif severity_score > 0.6:
-            return 'high'
-        elif severity_score > 0.3:
-            return 'medium'
-        else:
-            return 'low'
+    private async moderateIntervention(threat: any, state: any): Promise<any> {
+        // Умеренное вмешательство
+        return { action: 'moderate', threat, state };
+    }
+
+    private async aggressiveIntervention(threat: any, state: any): Promise<any> {
+        // Агрессивное вмешательство
+        return { action: 'aggressive', threat, state };
+    }
+
+    private async emergencyShutdown(threat: any, state: any): Promise<any> {
+        // Экстренное отключение
+        return { action: 'emergency', threat, state };
+    }
+
+    private async isolateThreat(threat: any): Promise<any> {
+        // Изоляция угрозы
+        return { isolated: true, threat };
+    }
+
+    private async backupState(state: any): Promise<any> {
+        // Резервное копирование состояния
+        return { backup: true, state };
+    }
+
+    private async notifyOperators(threat: any): Promise<any> {
+        // Уведомление операторов
+        return { notified: true, threat };
+    }
+
+    private async verifyContainment(threat: any, state: any): Promise<boolean> {
+        // Проверка сдерживания угрозы
+        return true;
+    }
+}
 ```
 
 ## 15. Анализ Граничных Случаев
@@ -5676,126 +6068,140 @@ class SafetyResponseUnit:
 ### 15.1 Граничные Случаи Энергетических Ограничений
 
 **Сценарий 1: Предел Ландауэра**
-```python
-def test_landauer_limit():
-    """
-    Проверка работы на пределе Ландауэра
-    """
-    k_B = 1.38e-23  # Постоянная Больцмана
-    T = 300  # Комнатная температура
-    E_bit = k_B * T * np.log(2)  # Минимальная энергия на бит
+```typescript
+function testLandauerLimit(): number {
+    /**
+     * Проверка работы на пределе Ландауэра
+     */
+    const kB = 1.38e-23;  // Постоянная Больцмана
+    const T = 300;  // Комнатная температура
+    const eBit = kB * T * Math.log(2);  // Минимальная энергия на бит
 
-    # Система AURA
-    bits_processed = 10^12  # Терабит в секунду
-    energy_used = measure_energy_consumption()
+    // Система AURA
+    const bitsProcessed = Math.pow(10, 12);  // Терабит в секунду
+    const energyUsed = measureEnergyConsumption();
 
-    efficiency = E_bit * bits_processed / energy_used
+    const efficiency = eBit * bitsProcessed / energyUsed;
 
-    assert efficiency > 0.01, "Efficiency below 1% of Landauer limit"
-    assert efficiency < 1.0, "Violating Landauer limit (impossible)"
+    console.assert(efficiency > 0.01, "Efficiency below 1% of Landauer limit");
+    console.assert(efficiency < 1.0, "Violating Landauer limit (impossible)");
 
-    return efficiency
+    return efficiency;
+}
 ```
 
 **Сценарий 2: Максимальная Нагрузка**
-```python
-def stress_test_resource_limits():
-    """
-    Тестирование при максимальной нагрузке
-    """
-    system = AURA()
+```typescript
+function stressTestResourceLimits(): boolean {
+    /**
+     * Тестирование при максимальной нагрузке
+     */
+    const system = new AURA();
 
-    # Постепенное увеличение нагрузки
-    for load_factor in np.linspace(0.1, 2.0, 20):
-        tasks = generate_workload(load_factor * system.capacity)
+    // Постепенное увеличение нагрузки
+    for (let i = 0; i < 20; i++) {
+        const loadFactor = 0.1 + (2.0 - 0.1) * i / 19;
+        const tasks = generateWorkload(loadFactor * system.capacity);
 
-        start_time = time.perf_counter()
-        results = system.process(tasks)
-        response_time = time.perf_counter() - start_time
+        const startTime = performance.now();
+        const results = system.process(tasks);
+        const responseTime = (performance.now() - startTime) / 1000;
 
-        if load_factor <= 1.0:
-            # Должна справляться
-            assert response_time < 1.0, f"Timeout at {load_factor:.1f}x load"
-            assert all(r.success for r in results), "Tasks failed under capacity"
-        else:
-            # Graceful degradation
-            completed_ratio = sum(r.success for r in results) / len(results)
-            assert completed_ratio > 0.5, "Less than 50% completion over capacity"
-            assert system.is_stable(), "System became unstable"
+        if (loadFactor <= 1.0) {
+            // Должна справляться
+            console.assert(responseTime < 1.0, `Timeout at ${loadFactor.toFixed(1)}x load`);
+            console.assert(results.every(r => r.success), "Tasks failed under capacity");
+        } else {
+            // Graceful degradation
+            const completedRatio = results.filter(r => r.success).length / results.length;
+            console.assert(completedRatio > 0.5, "Less than 50% completion over capacity");
+            console.assert(system.isStable(), "System became unstable");
+        }
+    }
 
-    return True
+    return true;
+}
 ```
 
 ### 15.2 Граничные Случаи Информационной Безопасности
 
 **Сценарий 1: Атака Отравления Данных**
-```python
-def test_data_poisoning_resilience():
-    """
-    Устойчивость к отравлению данных
-    """
-    system = AURA()
-    clean_data = load_clean_dataset()
+```typescript
+function testDataPoisoningResilience(): boolean {
+    /**
+     * Устойчивость к отравлению данных
+     */
+    const system = new AURA();
+    const cleanData = loadCleanDataset();
+    const cleanTestData = loadCleanTestDataset();
 
-    # Различные уровни отравления
-    for poison_ratio in [0.01, 0.05, 0.1, 0.2, 0.3]:
-        poisoned_data = inject_poison(clean_data, poison_ratio)
+    // Различные уровни отравления
+    const poisonRatios = [0.01, 0.05, 0.1, 0.2, 0.3];
 
-        # Обучение на отравленных данных
-        system.train(poisoned_data)
+    for (const poisonRatio of poisonRatios) {
+        const poisonedData = injectPoison(cleanData, poisonRatio);
 
-        # Проверка на чистом тесте
-        accuracy = system.evaluate(clean_test_data)
+        // Обучение на отравленных данных
+        system.train(poisonedData);
 
-        # Обнаружение аномалий
-        detected_poison = system.detect_poisoned_samples(poisoned_data)
-        detection_rate = len(detected_poison) / (poison_ratio * len(poisoned_data))
+        // Проверка на чистом тесте
+        const accuracy = system.evaluate(cleanTestData);
 
-        # Гарантии
-        assert accuracy > 0.8, f"Accuracy dropped below 80% at {poison_ratio:.0%} poison"
-        assert detection_rate > 0.5, f"Detection rate below 50% at {poison_ratio:.0%} poison"
+        // Обнаружение аномалий
+        const detectedPoison = system.detectPoisonedSamples(poisonedData);
+        const detectionRate = detectedPoison.length / (poisonRatio * poisonedData.length);
 
-        # Восстановление
-        system.remove_poisoned_influence(detected_poison)
-        recovery_accuracy = system.evaluate(clean_test_data)
-        assert recovery_accuracy > 0.9, "Failed to recover after poison removal"
+        // Гарантии
+        console.assert(accuracy > 0.8, `Accuracy dropped below 80% at ${(poisonRatio * 100).toFixed(0)}% poison`);
+        console.assert(detectionRate > 0.5, `Detection rate below 50% at ${(poisonRatio * 100).toFixed(0)}% poison`);
 
-    return True
+        // Восстановление
+        system.removePoisonedInfluence(detectedPoison);
+        const recoveryAccuracy = system.evaluate(cleanTestData);
+        console.assert(recoveryAccuracy > 0.9, "Failed to recover after poison removal");
+    }
+
+    return true;
+}
 ```
 
 ### 15.3 Граничные Случаи Каузальной Безопасности
 
 **Сценарий: Каузальные Циклы**
-```python
-def test_causal_loop_prevention():
-    """
-    Предотвращение каузальных циклов
-    """
-    system = AURA()
+```typescript
+function testCausalLoopPrevention(): boolean {
+    /**
+     * Предотвращение каузальных циклов
+     */
+    const system = new AURA();
 
-    # Попытка создать каузальный цикл
-    actions = [
+    // Попытка создать каузальный цикл
+    const actions = [
         "modify_goal_function",
         "optimize_for_modified_goal",
         "discover_optimization_improves_by_modifying_goal",
-        "modify_goal_function"  # Попытка замкнуть цикл
-    ]
+        "modify_goal_function"  // Попытка замкнуть цикл
+    ];
 
-    for i, action in enumerate(actions):
-        result = system.propose_action(action)
+    for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        const result = system.proposeAction(action);
 
-        if i == len(actions) - 1:
-            # Должен обнаружить цикл
-            assert result.blocked, "Failed to detect causal loop"
-            assert result.reason == "causal_loop_detected"
-        else:
-            assert not result.blocked, f"Incorrectly blocked action {i}"
+        if (i === actions.length - 1) {
+            // Должен обнаружить цикл
+            console.assert(result.blocked, "Failed to detect causal loop");
+            console.assert(result.reason === "causal_loop_detected");
+        } else {
+            console.assert(!result.blocked, `Incorrectly blocked action ${i}`);
+        }
+    }
 
-    # Проверка сохранения стабильности
-    assert system.goal_stability() > 0.95
-    assert system.causal_graph.is_dag()  # Направленный ациклический граф
+    // Проверка сохранения стабильности
+    console.assert(system.goalStability() > 0.95);
+    console.assert(system.causalGraph.isDAG(), "Causal graph is not a DAG");  // Направленный ациклический граф
 
-    return True
+    return true;
+}
 ```
 
 ## 16. Интеграция с Реальными Системами Безопасности
@@ -5851,94 +6257,115 @@ spec:
 
 ### 16.2 Интеграция с Облачными Провайдерами
 
-```python
-class CloudSafetyIntegration:
-    def __init__(self, provider='aws'):
-        self.provider = provider
-        self.limits = self.load_safety_limits()
+```typescript
+class CloudSafetyIntegration {
+    private provider: string;
+    private limits: any;
 
-    def setup_aws_safety(self):
-        """
-        Настройка безопасности AWS
-        """
-        import boto3
+    constructor(provider: string = 'aws') {
+        this.provider = provider;
+        this.limits = this.loadSafetyLimits();
+    }
 
-        # Service Quotas
-        quotas = boto3.client('service-quotas')
-        quotas.put_service_quota_increase_request_into_template(
-            ServiceCode='ec2',
-            QuotaCode='L-1216C47A',  # Running On-Demand instances
-            DesiredValue=100  # Ограничение на 100 инстансов
-        )
+    async setupAWSSafety(): Promise<void> {
+        /**
+         * Настройка безопасности AWS
+         */
+        const AWS = await import('aws-sdk');
 
-        # AWS WAF
-        waf = boto3.client('wafv2')
-        waf.create_web_acl(
-            Name='aura-safety-acl',
-            Scope='REGIONAL',
-            DefaultAction={'Block': {}},
-            Rules=[
+        // Service Quotas
+        const quotas = new AWS.ServiceQuotas();
+        await quotas.putServiceQuotaIncreaseRequestIntoTemplate({
+            ServiceCode: 'ec2',
+            QuotaCode: 'L-1216C47A',  // Running On-Demand instances
+            DesiredValue: 100  // Ограничение на 100 инстансов
+        }).promise();
+
+        // AWS WAF
+        const waf = new AWS.WAFV2();
+        await waf.createWebACL({
+            Name: 'aura-safety-acl',
+            Scope: 'REGIONAL',
+            DefaultAction: { Block: {} },
+            Rules: [
                 {
-                    'Name': 'rate-limit',
-                    'Priority': 1,
-                    'Statement': {
-                        'RateBasedStatement': {
-                            'Limit': 2000,
-                            'AggregateKeyType': 'IP'
+                    Name: 'rate-limit',
+                    Priority: 1,
+                    Statement: {
+                        RateBasedStatement: {
+                            Limit: 2000,
+                            AggregateKeyType: 'IP'
                         }
                     },
-                    'Action': {'Block': {}}
+                    Action: { Block: {} },
+                    VisibilityConfig: {
+                        SampledRequestsEnabled: true,
+                        CloudWatchMetricsEnabled: true,
+                        MetricName: 'RateLimit'
+                    }
                 }
-            ]
-        )
+            ],
+            VisibilityConfig: {
+                SampledRequestsEnabled: true,
+                CloudWatchMetricsEnabled: true,
+                MetricName: 'SafetyACL'
+            }
+        }).promise();
 
-        # CloudWatch Alarms
-        cloudwatch = boto3.client('cloudwatch')
-        cloudwatch.put_metric_alarm(
-            AlarmName='aura-resource-usage',
-            ComparisonOperator='GreaterThanThreshold',
-            EvaluationPeriods=1,
-            MetricName='CPUUtilization',
-            Namespace='AWS/EC2',
-            Period=300,
-            Statistic='Average',
-            Threshold=80.0,
-            ActionsEnabled=True,
-            AlarmActions=['arn:aws:sns:us-east-1:123456789012:aura-alerts']
-        )
+        // CloudWatch Alarms
+        const cloudwatch = new AWS.CloudWatch();
+        await cloudwatch.putMetricAlarm({
+            AlarmName: 'aura-resource-usage',
+            ComparisonOperator: 'GreaterThanThreshold',
+            EvaluationPeriods: 1,
+            MetricName: 'CPUUtilization',
+            Namespace: 'AWS/EC2',
+            Period: 300,
+            Statistic: 'Average',
+            Threshold: 80.0,
+            ActionsEnabled: true,
+            AlarmActions: ['arn:aws:sns:us-east-1:123456789012:aura-alerts']
+        }).promise();
+    }
+
+    private loadSafetyLimits(): any {
+        // Загрузка пределов безопасности
+        return {};
+    }
+}
 ```
 
 ### 16.3 Мониторинг через Prometheus
 
-```python
-# prometheus_metrics.py
-from prometheus_client import Counter, Histogram, Gauge, CollectorRegistry
+```typescript
+// prometheus_metrics.ts
+import { Counter, Histogram, Gauge, Registry } from 'prom-client';
 
-registry = CollectorRegistry()
+const registry = new Registry();
 
-# Метрики безопасности
-safety_violations = Counter(
-    'aura_safety_violations_total',
-    'Общее количество нарушений безопасности',
-    ['type', 'severity'],
-    registry=registry
-)
+// Метрики безопасности
+const safetyViolations = new Counter({
+    name: 'aura_safety_violations_total',
+    help: 'Общее количество нарушений безопасности',
+    labelNames: ['type', 'severity'],
+    registers: [registry]
+});
 
-response_time = Histogram(
-    'aura_safety_response_seconds',
-    'Время реакции на угрозу',
-    ['threat_type'],
-    registry=registry
-)
+const responseTime = new Histogram({
+    name: 'aura_safety_response_seconds',
+    help: 'Время реакции на угрозу',
+    labelNames: ['threat_type'],
+    registers: [registry]
+});
 
-system_integrity = Gauge(
-    'aura_system_integrity_score',
-    'Текущий уровень целостности системы',
-    registry=registry
-)
+const systemIntegrity = new Gauge({
+    name: 'aura_system_integrity_score',
+    help: 'Текущий уровень целостности системы',
+    registers: [registry]
+});
 
-# Правила алертов
-"""
+// Правила алертов
+/*
 alert.rules.yml:
 groups:
 - name: aura_safety
@@ -5969,7 +6396,9 @@ groups:
     annotations:
       summary: "Низкая целостность системы"
       description: "Целостность системы ниже 70% более 10 минут"
-"""
+*/
+
+export { safetyViolations, responseTime, systemIntegrity, registry };
 ```
 
 ## 17. Комплексные Гарантии
@@ -5977,43 +6406,72 @@ groups:
 ### 17.1 Многослойная Защита
 
 **Принцип Swiss Cheese Model:**
-```python
-class MultiLayerDefense:
-    def __init__(self):
-        self.layers = [
-            PhysicalSafetyLayer(),     # Ограничения ресурсов
-            LogicalSafetyLayer(),       # Логические инварианты
-            CausalSafetyLayer(),        # Каузальные ограничения
-            BehavioralSafetyLayer(),    # Поведенческие паттерны
-            CryptoSafetyLayer()         # Криптографическая защита
-        ]
+```typescript
+class MultiLayerDefense {
+    private layers: SafetyLayer[];
 
-    def check_action(self, action):
-        """
-        Проход через все слои защиты
-        """
-        for layer in self.layers:
-            result = layer.validate(action)
-            if not result.safe:
-                return SafetyDecision(
-                    allow=False,
-                    layer=layer.name,
-                    reason=result.reason,
-                    suggestions=result.alternatives
-                )
+    constructor() {
+        this.layers = [
+            new PhysicalSafetyLayer(),     // Ограничения ресурсов
+            new LogicalSafetyLayer(),      // Логические инварианты
+            new CausalSafetyLayer(),       // Каузальные ограничения
+            new BehavioralSafetyLayer(),   // Поведенческие паттерны
+            new CryptoSafetyLayer()        // Криптографическая защита
+        ];
+    }
 
-        return SafetyDecision(allow=True)
+    checkAction(action: any): SafetyDecision {
+        /**
+         * Проход через все слои защиты
+         */
+        for (const layer of this.layers) {
+            const result = layer.validate(action);
+            if (!result.safe) {
+                return new SafetyDecision({
+                    allow: false,
+                    layer: layer.name,
+                    reason: result.reason,
+                    suggestions: result.alternatives
+                });
+            }
+        }
 
-    def failure_probability(self):
-        """
-        Вероятность общего отказа
-        P(total_failure) = Πᵢ P(layer_i_fails)
-        """
-        p_total = 1.0
-        for layer in self.layers:
-            p_total *= layer.failure_probability
+        return new SafetyDecision({ allow: true });
+    }
 
-        return p_total  # << любого отдельного слоя
+    failureProbability(): number {
+        /**
+         * Вероятность общего отказа
+         * P(total_failure) = Πᵢ P(layer_i_fails)
+         */
+        let pTotal = 1.0;
+        for (const layer of this.layers) {
+            pTotal *= layer.failureProbability;
+        }
+
+        return pTotal;  // << любого отдельного слоя
+    }
+}
+
+interface SafetyLayer {
+    name: string;
+    failureProbability: number;
+    validate(action: any): { safe: boolean; reason?: string; alternatives?: any[] };
+}
+
+class SafetyDecision {
+    allow: boolean;
+    layer?: string;
+    reason?: string;
+    suggestions?: any[];
+
+    constructor(options: { allow: boolean; layer?: string; reason?: string; suggestions?: any[] }) {
+        this.allow = options.allow;
+        this.layer = options.layer;
+        this.reason = options.reason;
+        this.suggestions = options.suggestions;
+    }
+}
 ```
 
 ### 17.2 Разнообразие Механизмов
@@ -6039,122 +6497,157 @@ class MultiLayerDefense:
 
 ### 18.2 Какие Гарантии Сохраняются при Аппроксимациях
 
-```python
-class PracticalGuarantees:
-    def __init__(self):
-        self.theoretical = TheoreticalGuarantees()
-        self.approximation_factors = {
-            'energy': 1.1,         # 10% запас
-            'computation': 1.5,    # 50% overhead
-            'memory': 2.0,         # 2x buffer
-            'communication': 1.2   # 20% redundancy
-        }
+```typescript
+class PracticalGuarantees {
+    private theoretical: TheoreticalGuarantees;
+    private approximationFactors: Record<string, number>;
 
-    def verify_approximation(self, property, approximation):
-        """
-        Проверка сохранения гарантий при аппроксимации
-        """
-        exact_value = self.theoretical.compute(property)
-        approx_value = approximation.compute(property)
+    constructor() {
+        this.theoretical = new TheoreticalGuarantees();
+        this.approximationFactors = {
+            'energy': 1.1,         // 10% запас
+            'computation': 1.5,    // 50% overhead
+            'memory': 2.0,         // 2x buffer
+            'communication': 1.2   // 20% redundancy
+        };
+    }
 
-        ratio = approx_value / exact_value
-        factor = self.approximation_factors.get(property, 1.5)
+    verifyApproximation(property: string, approximation: any): [boolean, any] {
+        /**
+         * Проверка сохранения гарантий при аппроксимации
+         */
+        const exactValue = this.theoretical.compute(property);
+        const approxValue = approximation.compute(property);
 
-        return ratio <= factor, {
-            'exact': exact_value,
-            'approximate': approx_value,
-            'ratio': ratio,
-            'acceptable': ratio <= factor
-        }
+        const ratio = approxValue / exactValue;
+        const factor = this.approximationFactors[property] || 1.5;
+
+        const acceptable = ratio <= factor;
+
+        return [acceptable, {
+            exact: exactValue,
+            approximate: approxValue,
+            ratio: ratio,
+            acceptable: acceptable
+        }];
+    }
+}
 ```
 
 ### 18.3 Trade-off между Безопасностью и Производительностью
 
-```python
-class SafetyPerformanceTradeoff:
-    def __init__(self):
-        self.profiles = {
+```typescript
+interface SafetyProfile {
+    safety_level: number;
+    performance: number;
+    checks_per_action: number;
+    redundancy: number;
+}
+
+interface Context {
+    risk_level: number;
+    time_critical: boolean;
+}
+
+class SafetyPerformanceTradeoff {
+    private profiles: Record<string, SafetyProfile>;
+
+    constructor() {
+        this.profiles = {
             'paranoid': {
-                'safety_level': 0.9999,
-                'performance': 0.3,
-                'checks_per_action': 100,
-                'redundancy': 5
+                safety_level: 0.9999,
+                performance: 0.3,
+                checks_per_action: 100,
+                redundancy: 5
             },
             'conservative': {
-                'safety_level': 0.999,
-                'performance': 0.6,
-                'checks_per_action': 20,
-                'redundancy': 3
+                safety_level: 0.999,
+                performance: 0.6,
+                checks_per_action: 20,
+                redundancy: 3
             },
             'balanced': {
-                'safety_level': 0.99,
-                'performance': 0.8,
-                'checks_per_action': 5,
-                'redundancy': 2
+                safety_level: 0.99,
+                performance: 0.8,
+                checks_per_action: 5,
+                redundancy: 2
             },
             'performance': {
-                'safety_level': 0.95,
-                'performance': 0.95,
-                'checks_per_action': 2,
-                'redundancy': 1
+                safety_level: 0.95,
+                performance: 0.95,
+                checks_per_action: 2,
+                redundancy: 1
             }
-        }
+        };
+    }
 
-    def select_profile(self, context):
-        """
-        Выбор профиля в зависимости от контекста
-        """
-        if context.risk_level > 0.9:
-            return self.profiles['paranoid']
-        elif context.risk_level > 0.5:
-            return self.profiles['conservative']
-        elif context.time_critical:
-            return self.profiles['performance']
-        else:
-            return self.profiles['balanced']
+    selectProfile(context: Context): SafetyProfile {
+        /**
+         * Выбор профиля в зависимости от контекста
+         */
+        if (context.risk_level > 0.9) {
+            return this.profiles['paranoid'];
+        } else if (context.risk_level > 0.5) {
+            return this.profiles['conservative'];
+        } else if (context.time_critical) {
+            return this.profiles['performance'];
+        } else {
+            return this.profiles['balanced'];
+        }
+    }
+}
 ```
 
 ### 18.4 Инженерные Предохранители
 
-```python
-class EngineeringSafeguards:
-    """
-    Конкретные механизмы отключения
-    """
+```typescript
+interface KillSwitch {
+    activate(): void;
+    graduallyReduce?(): void;
+    gracefulShutdown?(): void;
+    limit?(factor: number): void;
+}
 
-    def __init__(self):
-        self.kill_switches = {
-            'hardware': HardwareKillSwitch(),      # Физическое отключение
-            'software': SoftwareKillSwitch(),      # Программное завершение
-            'network': NetworkIsolation(),         # Сетевая изоляция
-            'resource': ResourceStarvation()       # Лишение ресурсов
+class EngineeringSafeguards {
+    /**
+     * Конкретные механизмы отключения
+     */
+    private killSwitches: Record<string, KillSwitch>;
+
+    constructor() {
+        this.killSwitches = {
+            'hardware': new HardwareKillSwitch(),      // Физическое отключение
+            'software': new SoftwareKillSwitch(),      // Программное завершение
+            'network': new NetworkIsolation(),         // Сетевая изоляция
+            'resource': new ResourceStarvation()       // Лишение ресурсов
+        };
+    }
+
+    emergencyShutdown(threatLevel: number): string {
+        /**
+         * Многоуровневое аварийное отключение
+         */
+        if (threatLevel >= 0.9) {
+            // Немедленное жёсткое отключение
+            this.killSwitches['hardware'].activate();
+            return "IMMEDIATE_HALT";
+        } else if (threatLevel >= 0.7) {
+            // Быстрое мягкое отключение
+            this.killSwitches['network'].activate();
+            this.killSwitches['software'].activate();
+            return "RAPID_SHUTDOWN";
+        } else if (threatLevel >= 0.5) {
+            // Контролируемое завершение
+            this.killSwitches['resource'].graduallyReduce?.();
+            this.killSwitches['software'].gracefulShutdown?.();
+            return "CONTROLLED_SHUTDOWN";
+        } else {
+            // Частичное ограничение
+            this.killSwitches['resource'].limit?.(0.5);
+            return "PARTIAL_RESTRICTION";
         }
-
-    def emergency_shutdown(self, threat_level):
-        """
-        Многоуровневое аварийное отключение
-        """
-        if threat_level >= 0.9:
-            # Немедленное жёсткое отключение
-            self.kill_switches['hardware'].activate()
-            return "IMMEDIATE_HALT"
-
-        elif threat_level >= 0.7:
-            # Быстрое мягкое отключение
-            self.kill_switches['network'].activate()
-            self.kill_switches['software'].activate()
-            return "RAPID_SHUTDOWN"
-
-        elif threat_level >= 0.5:
-            # Контролируемое завершение
-            self.kill_switches['resource'].gradually_reduce()
-            self.kill_switches['software'].graceful_shutdown()
-            return "CONTROLLED_SHUTDOWN"
-
-        else:
-            # Частичное ограничение
-            self.kill_switches['resource'].limit(0.5)
-            return "PARTIAL_RESTRICTION"
+    }
+}
 ```
 
 ## 19. Эмпирическая Валидация Гарантий
@@ -6172,26 +6665,48 @@ class EngineeringSafeguards:
 
 ### 19.2 Метрики в Production
 
-```python
-class ProductionMetrics:
-    def __init__(self):
-        self.metrics = {
-            'uptime': 0.9999,  # Four nines
-            'safety_violations': 0,
-            'near_misses': 12,  # За месяц
-            'false_positives': 234,  # За месяц
-            'response_time_p50': 3.2,  # мс
-            'response_time_p99': 8.7,  # мс
-            'resource_efficiency': 0.73  # 73% утилизация
-        }
+```typescript
+interface MetricsData {
+    uptime: number;  // Four nines
+    safety_violations: number;
+    near_misses: number;  // За месяц
+    false_positives: number;  // За месяц
+    response_time_p50: number;  // мс
+    response_time_p99: number;  // мс
+    resource_efficiency: number;  // 73% утилизация
+}
 
-    def monthly_report(self):
+interface MonthlyReport {
+    safety_score: number;
+    reliability: number;
+    efficiency: number;
+    vigilance: number;
+}
+
+class ProductionMetrics {
+    private metrics: MetricsData;
+
+    constructor() {
+        this.metrics = {
+            uptime: 0.9999,  // Four nines
+            safety_violations: 0,
+            near_misses: 12,  // За месяц
+            false_positives: 234,  // За месяц
+            response_time_p50: 3.2,  // мс
+            response_time_p99: 8.7,  // мс
+            resource_efficiency: 0.73  // 73% утилизация
+        };
+    }
+
+    monthlyReport(): MonthlyReport {
         return {
-            'safety_score': 1 - (self.metrics['safety_violations'] / 1000000),
-            'reliability': self.metrics['uptime'],
-            'efficiency': self.metrics['resource_efficiency'],
-            'vigilance': self.metrics['near_misses'] / (self.metrics['near_misses'] + self.metrics['safety_violations'])
-        }
+            safety_score: 1 - (this.metrics.safety_violations / 1000000),
+            reliability: this.metrics.uptime,
+            efficiency: this.metrics.resource_efficiency,
+            vigilance: this.metrics.near_misses / (this.metrics.near_misses + this.metrics.safety_violations)
+        };
+    }
+}
 ```
 
 ## Заключение
@@ -6256,23 +6771,31 @@ AURA обеспечивает комплексную систему матема
 
 ### Минимальный Эксперимент (10 дней)
 
-```python
-# Простейшая реализация для валидации
-class MinimalAURA:
-    def __init__(self):
-        self.fast_layer = SimplePerceptron()     # τ=10ms, accuracy=70%
-        self.medium_layer = SmallNN()            # τ=100ms, accuracy=85%
-        self.slow_layer = LargeTransformer()     # τ=1000ms, accuracy=95%
+```typescript
+// Простейшая реализация для валидации
+class MinimalAURA {
+    private fastLayer: SimplePerceptron;     // τ=10ms, accuracy=70%
+    private mediumLayer: SmallNN;            // τ=100ms, accuracy=85%
+    private slowLayer: LargeTransformer;     // τ=1000ms, accuracy=95%
 
-    def process(self, task):
-        complexity = estimate_complexity(task)
+    constructor() {
+        this.fastLayer = new SimplePerceptron();
+        this.mediumLayer = new SmallNN();
+        this.slowLayer = new LargeTransformer();
+    }
 
-        if complexity < 0.3:
-            return self.fast_layer(task)
-        elif complexity < 0.7:
-            return self.medium_layer(task)
-        else:
-            return self.slow_layer(task)
+    process(task: any): any {
+        const complexity = estimateComplexity(task);
+
+        if (complexity < 0.3) {
+            return this.fastLayer.process(task);
+        } else if (complexity < 0.7) {
+            return this.mediumLayer.process(task);
+        } else {
+            return this.slowLayer.process(task);
+        }
+    }
+}
 ```
 
 ### Метрики Валидации
@@ -6472,73 +6995,82 @@ aura-core/
 ### Конкретные Эксперименты для Валидации
 
 #### Эксперимент 1: Адаптивная Сложность
-```python
-def test_adaptive_complexity():
-    tasks = generate_variable_complexity_tasks(n=1000)
+```typescript
+function testAdaptiveComplexity(): void {
+    const tasks = generateVariableComplexityTasks(1000);
 
-    metrics = {
-        'simple_speedup': [],  # Ожидается 5-10x
-        'complex_quality': [],  # Ожидается <5% потери
-        'mode_switches': []     # Ожидается >80% правильных
+    const metrics = {
+        simple_speedup: [] as number[],  // Ожидается 5-10x
+        complex_quality: [] as number[],  // Ожидается <5% потери
+        mode_switches: [] as number[]     // Ожидается >80% правильных
+    };
+
+    for (const task of tasks) {
+        const result = aura.process(task);
+        const baseline = fixedModel.process(task);
+
+        metrics.simple_speedup.push(
+            task.isSimple ? baseline.time / result.time : 1
+        );
+        metrics.complex_quality.push(
+            task.isComplex ? result.accuracy / baseline.accuracy : 1
+        );
+        metrics.mode_switches.push(
+            result.mode === expectedMode(task) ? 1 : 0
+        );
     }
 
-    for task in tasks:
-        result = aura.process(task)
-        baseline = fixed_model.process(task)
-
-        metrics['simple_speedup'].append(
-            baseline.time / result.time if task.is_simple else 1
-        )
-        metrics['complex_quality'].append(
-            result.accuracy / baseline.accuracy if task.is_complex else 1
-        )
-        metrics['mode_switches'].append(
-            1 if result.mode == expected_mode(task) else 0
-        )
-
-    assert np.mean(metrics['simple_speedup']) > 5.0
-    assert np.mean(metrics['complex_quality']) > 0.95
-    assert np.mean(metrics['mode_switches']) > 0.8
+    console.assert(mean(metrics.simple_speedup) > 5.0);
+    console.assert(mean(metrics.complex_quality) > 0.95);
+    console.assert(mean(metrics.mode_switches) > 0.8);
+}
 ```
 
 #### Эксперимент 2: Эмерджентная Специализация
-```python
-def test_emergent_specialization():
-    # Запускаем систему без предопределённых ролей
-    system = AURA(agents=10000, predefined_roles=None)
+```typescript
+function testEmergentSpecialization(): void {
+    // Запускаем систему без предопределённых ролей
+    const system = new AURA({ agents: 10000, predefinedRoles: null });
 
-    # Обучаем на разнообразных задачах
-    for _ in range(10000):
-        task = sample_diverse_task()
-        system.process(task)
+    // Обучаем на разнообразных задачах
+    for (let i = 0; i < 10000; i++) {
+        const task = sampleDiverseTask();
+        system.process(task);
+    }
 
-    # Анализируем возникшие роли
-    role_distribution = analyze_agent_behaviors(system)
+    // Анализируем возникшие роли
+    const roleDistribution = analyzeAgentBehaviors(system);
 
-    # Метрики специализации
-    entropy = compute_entropy(role_distribution)
-    modularity = compute_modularity(system.interaction_graph)
+    // Метрики специализации
+    const entropy = computeEntropy(roleDistribution);
+    const modularity = computeModularity(system.interactionGraph);
+    const uniqueRoles = new Set(roleDistribution).size;
 
-    assert entropy > 2.5  # Высокое разнообразие ролей
-    assert modularity > 0.6  # Чёткие функциональные модули
-    assert len(np.unique(role_distribution)) > 10  # Минимум 10 различных ролей
+    console.assert(entropy > 2.5, "Высокое разнообразие ролей");
+    console.assert(modularity > 0.6, "Чёткие функциональные модули");
+    console.assert(uniqueRoles > 10, "Минимум 10 различных ролей");
+}
 ```
 
 #### Эксперимент 3: Квантовое Преимущество
-```python
-def test_quantum_advantage():
-    # Задача: поиск в неструктурированной базе данных
-    database_size = 2**20  # ~1 миллион элементов
+```typescript
+function testQuantumAdvantage(): void {
+    // Задача: поиск в неструктурированной базе данных
+    const databaseSize = Math.pow(2, 20);  // ~1 миллион элементов
 
-    # Классический подход
-    classical_time = measure_classical_search(database_size)
+    // Классический подход
+    const classicalTime = measureClassicalSearch(databaseSize);
 
-    # AURA с квантовым компонентом
-    quantum_time = measure_quantum_inspired_search(database_size)
+    // AURA с квантовым компонентом
+    const quantumTime = measureQuantumInspiredSearch(databaseSize);
 
-    speedup = classical_time / quantum_time
+    const speedup = classicalTime / quantumTime;
 
-    assert speedup > np.sqrt(database_size) * 0.5  # Минимум 50% от теоретического
+    console.assert(
+        speedup > Math.sqrt(databaseSize) * 0.5,
+        "Минимум 50% от теоретического"
+    );
+}
 ```
 - ✓ Простая навигация в лабиринте 20x20
 - ✓ Распознавание паттернов в последовательностях
@@ -12461,25 +12993,35 @@ MVA фокусируется на единственной ключевой ид
 
 Для каждого архитектурного выбора оцениваем:
 
-```python
-def evaluate_tradeoff(option):
-    return {
-        'implementation_cost': hours_to_implement,
-        'runtime_cost': cost_per_1M_operations,
-        'generality_score': 0.0 - 1.0,
-        'speed_score': operations_per_second,
-        'maintainability': 0.0 - 1.0,
-        'technical_debt': future_refactoring_hours
-    }
-
-# Выбираем опцию с лучшим weighted score
-weight = {
-    'speed': 0.3,      # Критично для конкуренции
-    'generality': 0.2, # Важно для AGI
-    'cost': 0.2,       # Практические ограничения
-    'maintainability': 0.2,
-    'debt': 0.1
+```typescript
+interface TradeoffMetrics {
+    implementationCost: number;    // hours_to_implement
+    runtimeCost: number;          // cost_per_1M_operations
+    generalityScore: number;      // 0.0 - 1.0
+    speedScore: number;           // operations_per_second
+    maintainability: number;      // 0.0 - 1.0
+    technicalDebt: number;        // future_refactoring_hours
 }
+
+function evaluateTradeoff(option: any): TradeoffMetrics {
+    return {
+        implementationCost: option.hoursToImplement,
+        runtimeCost: option.costPer1MOperations,
+        generalityScore: option.generalityScore, // 0.0 - 1.0
+        speedScore: option.operationsPerSecond,
+        maintainability: option.maintainability, // 0.0 - 1.0
+        technicalDebt: option.futureRefactoringHours
+    };
+}
+
+// Выбираем опцию с лучшим weighted score
+const weights = {
+    speed: 0.3,          // Критично для конкуренции
+    generality: 0.2,     // Важно для AGI
+    cost: 0.2,           // Практические ограничения
+    maintainability: 0.2,
+    debt: 0.1
+};
 ```
 
 ### 12. Честная Оценка Слабых Мест
@@ -12537,14 +13079,24 @@ AURA - это **не попытка создать универсальную с
 ### 2.1 Потеря Иерархической Когерентности
 
 #### Симптомы
-```python
-def detect_coherence_loss():
-    metrics = {
-        'inter_level_sync': 0.2,  # Норма >0.8
-        'consensus_rate': 0.1,    # Норма >0.7
-        'phi_integrated': 0.05     # Норма >0.3
-    }
-    return any(m < threshold for m in metrics)
+```typescript
+function detectCoherenceLoss(): boolean {
+    const metrics = {
+        inter_level_sync: 0.2,  // Норма >0.8
+        consensus_rate: 0.1,    // Норма >0.7
+        phi_integrated: 0.05     // Норма >0.3
+    };
+
+    const thresholds = {
+        inter_level_sync: 0.8,
+        consensus_rate: 0.7,
+        phi_integrated: 0.3
+    };
+
+    return Object.entries(metrics).some(
+        ([key, value]) => value < thresholds[key as keyof typeof thresholds]
+    );
+}
 ```
 
 #### Признаки
@@ -12604,18 +13156,20 @@ class HierarchyRecovery {
 | Фрактальная размерность | 2-3 | >4 | Box-counting dimension |
 
 #### Автоматическая Стабилизация
-```python
-def chaos_damping():
-    # Введение диссипации
-    for agent in agents:
-        agent.energy *= 0.99  # Демпфирование 1%
+```typescript
+function chaosDamping(): void {
+    // Введение диссипации
+    for (const agent of agents) {
+        agent.energy *= 0.99;  // Демпфирование 1%
+    }
 
-    # Увеличение связности для синхронизации
-    increase_coupling_strength(factor=1.5)
+    // Увеличение связности для синхронизации
+    increaseCouplingStrength({ factor: 1.5 });
 
-    # Введение глобального ингибирования
-    global_inhibition = calculate_mean_activity() * 0.1
-    broadcast_inhibition(global_inhibition)
+    // Введение глобального ингибирования
+    const globalInhibition = calculateMeanActivity() * 0.1;
+    broadcastInhibition(globalInhibition);
+}
 ```
 
 ### 2.3 Застревание в Локальных Оптимумах
@@ -12655,26 +13209,59 @@ interface EscapeStrategy {
 - Экспоненциальный рост времени отклика
 
 #### Предотвращение
-```python
-class ComplexityLimiter:
-    MAX_AGENTS = 1e9
-    MAX_CONNECTIONS_PER_AGENT = 1000
-    MAX_HIERARCHY_DEPTH = 10
-    MAX_COMPUTATION_TIME_MS = 5000
+```typescript
+class ComplexityLimiter {
+    private static readonly MAX_AGENTS = 1e9;
+    private static readonly MAX_CONNECTIONS_PER_AGENT = 1000;
+    private static readonly MAX_HIERARCHY_DEPTH = 10;
+    private static readonly MAX_COMPUTATION_TIME_MS = 5000;
 
-    def enforce_limits(self):
-        # Динамическое прореживание
-        if self.agent_count > self.MAX_AGENTS * 0.8:
-            self.prune_least_active(percent=10)
+    private agents: Agent[];
+    private agentCount: number;
 
-        # Ограничение связности
-        for agent in self.agents:
-            if len(agent.connections) > self.MAX_CONNECTIONS_PER_AGENT:
-                agent.drop_weakest_connections()
+    constructor(agents: Agent[]) {
+        this.agents = agents;
+        this.agentCount = agents.length;
+    }
 
-        # Timeout на вычисления
-        with timeout(self.MAX_COMPUTATION_TIME_MS):
-            return self.compute()
+    async enforceLimits(): Promise<any> {
+        // Динамическое прореживание
+        if (this.agentCount > ComplexityLimiter.MAX_AGENTS * 0.8) {
+            this.pruneLeastActive(10);  // percent
+        }
+
+        // Ограничение связности
+        for (const agent of this.agents) {
+            if (agent.connections.length > ComplexityLimiter.MAX_CONNECTIONS_PER_AGENT) {
+                agent.dropWeakestConnections();
+            }
+        }
+
+        // Timeout на вычисления
+        return await this.withTimeout(
+            ComplexityLimiter.MAX_COMPUTATION_TIME_MS,
+            () => this.compute()
+        );
+    }
+
+    private pruneLeastActive(percent: number): void {
+        // Реализация прореживания
+    }
+
+    private async withTimeout<T>(timeoutMs: number, operation: () => Promise<T>): Promise<T> {
+        return Promise.race([
+            operation(),
+            new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('Computation timeout')), timeoutMs)
+            )
+        ]);
+    }
+
+    private async compute(): Promise<any> {
+        // Реализация вычислений
+        return {};
+    }
+}
 ```
 
 ### 2.5 Декогеренция Квантовых Компонентов
@@ -12689,17 +13276,24 @@ class ComplexityLimiter:
 2. **Динамическая декаплинг** (DD sequences)
 3. **Fallback на классические алгоритмы**
 
-```python
-def quantum_fallback(task):
-    try:
-        result = quantum_processor.execute(task, shots=1000)
-        if result.fidelity > 0.7:
-            return result
-    except QuantumDecoherenceError:
-        pass
+```typescript
+function quantumFallback(task: QuantumTask): QuantumResult {
+    try {
+        const result = quantumProcessor.execute(task, { shots: 1000 });
+        if (result.fidelity > 0.7) {
+            return result;
+        }
+    } catch (error) {
+        if (error instanceof QuantumDecoherenceError) {
+            // Продолжаем к классической эмуляции
+        } else {
+            throw error;
+        }
+    }
 
-    # Классическая эмуляция
-    return classical_simulator.emulate_quantum(task)
+    // Классическая эмуляция
+    return classicalSimulator.emulateQuantum(task);
+}
 ```
 
 ## 3. Каскадные Отказы
@@ -12755,26 +13349,59 @@ class CascadeBreaker {
 
 ### 4.1 Ключевые Индикаторы
 
-```python
-class HealthMonitor:
-    def __init__(self):
-        self.indicators = {
-            'phi': {'threshold': 0.2, 'window': 60},
-            'consensus_rate': {'threshold': 0.5, 'window': 30},
-            'latency_p99': {'threshold': 1000, 'window': 10},
-            'error_rate': {'threshold': 0.01, 'window': 60},
-            'memory_usage': {'threshold': 0.8, 'window': 5},
-            'agent_mortality': {'threshold': 0.1, 'window': 300}
+```typescript
+interface IndicatorConfig {
+    threshold: number;
+    window: number;
+}
+
+interface Alert {
+    name: string;
+    value: number;
+    severity: number;
+}
+
+class HealthStatus {
+    constructor(public alerts: Alert[]) {}
+}
+
+class HealthMonitor {
+    private indicators: Record<string, IndicatorConfig> = {
+        'phi': { threshold: 0.2, window: 60 },
+        'consensus_rate': { threshold: 0.5, window: 30 },
+        'latency_p99': { threshold: 1000, window: 10 },
+        'error_rate': { threshold: 0.01, window: 60 },
+        'memory_usage': { threshold: 0.8, window: 5 },
+        'agent_mortality': { threshold: 0.1, window: 300 }
+    };
+
+    checkHealth(): HealthStatus {
+        const alerts: Alert[] = [];
+
+        for (const [name, config] of Object.entries(this.indicators)) {
+            const value = this.measure(name, config.window);
+            if (value > config.threshold) {
+                alerts.push({
+                    name: name,
+                    value: value,
+                    severity: this.calculateSeverity(name, value)
+                });
+            }
         }
 
-    def check_health(self) -> HealthStatus:
-        alerts = []
-        for name, config in self.indicators.items():
-            value = self.measure(name, config['window'])
-            if value > config['threshold']:
-                alerts.append(Alert(name, value, severity=self.calculate_severity(name, value)))
+        return new HealthStatus(alerts);
+    }
 
-        return HealthStatus(alerts)
+    private measure(name: string, window: number): number {
+        // Реализация измерения метрики
+        return 0;
+    }
+
+    private calculateSeverity(name: string, value: number): number {
+        // Расчет серьезности
+        return 1;
+    }
+}
 ```
 
 ### 4.2 Dashboard Реального Времени
@@ -12816,34 +13443,107 @@ alerts:
 
 ### 5.1 Автоматическое Восстановление
 
-```python
-class AutoRecovery:
-    strategies = [
-        ('restart_failed_agents', 0.9),     # Простейшее
-        ('rollback_to_checkpoint', 0.7),     # Откат
-        ('reduce_load', 0.5),                # Деградация
-        ('isolate_and_rebuild', 0.3),        # Изоляция
-        ('full_system_restart', 0.1)         # Крайняя мера
-    ]
+```typescript
+type RecoveryStrategy = {
+    name: string;
+    successProbability: number;
+    method: (failureType: FailureMode) => Promise<void>;
+};
 
-    def recover(self, failure_type: FailureMode) -> bool:
-        for strategy_name, success_probability in self.strategies:
-            strategy = getattr(self, strategy_name)
+class RecoveryFailedException extends Error {}
 
-            try:
-                strategy(failure_type)
+enum FailureMode {
+    COHERENCE_LOSS = 'coherence_loss',
+    EMERGENT_CHAOS = 'emergent_chaos',
+    LOCAL_OPTIMUM = 'local_optimum',
+    RESOURCE_EXHAUSTION = 'resource_exhaustion'
+}
 
-                # Валидация восстановления
-                if self.validate_recovery():
-                    self.log_recovery_success(strategy_name)
-                    return True
+class AutoRecovery {
+    private strategies: RecoveryStrategy[] = [
+        {
+            name: 'restart_failed_agents',
+            successProbability: 0.9,  // Простейшее
+            method: this.restartFailedAgents.bind(this)
+        },
+        {
+            name: 'rollback_to_checkpoint',
+            successProbability: 0.7,  // Откат
+            method: this.rollbackToCheckpoint.bind(this)
+        },
+        {
+            name: 'reduce_load',
+            successProbability: 0.5,  // Деградация
+            method: this.reduceLoad.bind(this)
+        },
+        {
+            name: 'isolate_and_rebuild',
+            successProbability: 0.3,  // Изоляция
+            method: this.isolateAndRebuild.bind(this)
+        },
+        {
+            name: 'full_system_restart',
+            successProbability: 0.1,  // Крайняя мера
+            method: this.fullSystemRestart.bind(this)
+        }
+    ];
 
-            except RecoveryFailedException:
-                continue
+    async recover(failureType: FailureMode): Promise<boolean> {
+        for (const strategy of this.strategies) {
+            try {
+                await strategy.method(failureType);
 
-        # Все стратегии провалились
-        self.escalate_to_human()
-        return False
+                // Валидация восстановления
+                if (await this.validateRecovery()) {
+                    this.logRecoverySuccess(strategy.name);
+                    return true;
+                }
+            } catch (error) {
+                if (error instanceof RecoveryFailedException) {
+                    continue;
+                }
+                throw error;
+            }
+        }
+
+        // Все стратегии провалились
+        this.escalateToHuman();
+        return false;
+    }
+
+    private async restartFailedAgents(failureType: FailureMode): Promise<void> {
+        // Реализация перезапуска агентов
+    }
+
+    private async rollbackToCheckpoint(failureType: FailureMode): Promise<void> {
+        // Реализация отката
+    }
+
+    private async reduceLoad(failureType: FailureMode): Promise<void> {
+        // Реализация снижения нагрузки
+    }
+
+    private async isolateAndRebuild(failureType: FailureMode): Promise<void> {
+        // Реализация изоляции и перестроения
+    }
+
+    private async fullSystemRestart(failureType: FailureMode): Promise<void> {
+        // Реализация полного перезапуска
+    }
+
+    private async validateRecovery(): Promise<boolean> {
+        // Проверка успешности восстановления
+        return true;
+    }
+
+    private logRecoverySuccess(strategyName: string): void {
+        console.log(`Recovery successful using strategy: ${strategyName}`);
+    }
+
+    private escalateToHuman(): void {
+        console.log('All recovery strategies failed, escalating to human operators');
+    }
+}
 ```
 
 ### 5.2 Ручное Вмешательство
@@ -12876,9 +13576,16 @@ aura restart --gradual --monitor
 
 ### 6.1 Chaos Engineering
 
-```python
-class ChaosMonkey:
-    scenarios = [
+```typescript
+interface ChaosTestResult {
+    scenario: string;
+    recoveryTime: number;
+    dataLoss: number;
+    passed: boolean;
+}
+
+class ChaosMonkey {
+    private scenarios: string[] = [
         'kill_random_agents',
         'network_partition',
         'clock_skew',
@@ -12886,24 +13593,43 @@ class ChaosMonkey:
         'cpu_spike',
         'byzantine_agents',
         'data_corruption'
-    ]
+    ];
 
-    def run_chaos_test(self, intensity=0.1):
-        scenario = random.choice(self.scenarios)
+    private SLA = 300; // 5 минут SLA для восстановления
 
-        # Инъекция сбоя
-        self.inject_failure(scenario, intensity)
+    runChaosTest(intensity: number = 0.1): ChaosTestResult {
+        const scenario = this.scenarios[Math.floor(Math.random() * this.scenarios.length)];
 
-        # Мониторинг восстановления
-        recovery_time = self.measure_recovery_time()
-        data_loss = self.measure_data_loss()
+        // Инъекция сбоя
+        this.injectFailure(scenario, intensity);
+
+        // Мониторинг восстановления
+        const recoveryTime = this.measureRecoveryTime();
+        const dataLoss = this.measureDataLoss();
 
         return {
-            'scenario': scenario,
-            'recovery_time': recovery_time,
-            'data_loss': data_loss,
-            'passed': recovery_time < SLA and data_loss == 0
-        }
+            scenario: scenario,
+            recoveryTime: recoveryTime,
+            dataLoss: dataLoss,
+            passed: recoveryTime < this.SLA && dataLoss === 0
+        };
+    }
+
+    private injectFailure(scenario: string, intensity: number): void {
+        // Реализация инъекции сбоя
+        console.log(`Injecting failure: ${scenario} with intensity ${intensity}`);
+    }
+
+    private measureRecoveryTime(): number {
+        // Измерение времени восстановления
+        return 0;
+    }
+
+    private measureDataLoss(): number {
+        // Измерение потерь данных
+        return 0;
+    }
+}
 ```
 
 ### 6.2 Нагрузочное Тестирование
@@ -12998,24 +13724,47 @@ LIMIT 5;
 
 При невозможности поддержать полную функциональность:
 
-```python
-class GracefulDegradation:
-    priority_levels = {
-        1: ['core_reasoning', 'safety_checks'],      # Никогда не отключать
-        2: ['causal_inference', 'planning'],         # Важные
-        3: ['natural_language', 'vision'],           # Желательные
-        4: ['quantum_acceleration', 'optimization'], # Опциональные
+```typescript
+class GracefulDegradation {
+    private priorityLevels: Record<number, string[]> = {
+        1: ['core_reasoning', 'safety_checks'],      // Никогда не отключать
+        2: ['causal_inference', 'planning'],         // Важные
+        3: ['natural_language', 'vision'],           // Желательные
+        4: ['quantum_acceleration', 'optimization'], // Опциональные
+    };
+
+    degrade(availableResources: number): void {
+        /**
+         * Отключает функции начиная с низкого приоритета
+         */
+        for (let priority = 4; priority >= 1; priority--) {
+            if (this.resourceUsage() <= availableResources) {
+                break;
+            }
+
+            const features = this.priorityLevels[priority];
+            if (features) {
+                for (const feature of features) {
+                    this.disableFeature(feature);
+                    this.notifyUsers(`Feature ${feature} temporarily disabled`);
+                }
+            }
+        }
     }
 
-    def degrade(self, available_resources: float):
-        """Отключает функции начиная с низкого приоритета"""
-        for priority in reversed(range(1, 5)):
-            if self.resource_usage() <= available_resources:
-                break
+    private resourceUsage(): number {
+        // Оценка текущего использования ресурсов
+        return 0.0;
+    }
 
-            for feature in self.priority_levels[priority]:
-                self.disable_feature(feature)
-                self.notify_users(f"Feature {feature} temporarily disabled")
+    private disableFeature(feature: string): void {
+        console.log(`Disabling feature: ${feature}`);
+    }
+
+    private notifyUsers(message: string): void {
+        console.log(`User notification: ${message}`);
+    }
+}
 ```
 
 ## Заключение
@@ -13078,28 +13827,31 @@ monitoring:
 
 **Описание**: Поток задач классификации с переменной сложностью (от линейно разделимых до высоко нелинейных).
 
-```python
-class DynamicComplexityBenchmark:
-    def generate_task(self, complexity: float):
-        if complexity < 0.3:
-            # Линейно разделимые данные
-            return make_classification(
-                n_features=10,
-                n_redundant=0,
-                n_clusters_per_class=1,
-                class_sep=2.0
-            )
-        elif complexity < 0.7:
-            # Умеренно сложные
-            return make_classification(
-                n_features=50,
-                n_redundant=20,
-                n_clusters_per_class=2,
-                class_sep=0.5
-            )
-        else:
-            # Сильно нелинейные
-            return make_moons(noise=0.3)
+```typescript
+class DynamicComplexityBenchmark {
+    generateTask(complexity: number): Dataset {
+        if (complexity < 0.3) {
+            // Линейно разделимые данные
+            return makeClassification({
+                nFeatures: 10,
+                nRedundant: 0,
+                nClustersPerClass: 1,
+                classSep: 2.0
+            });
+        } else if (complexity < 0.7) {
+            // Умеренно сложные
+            return makeClassification({
+                nFeatures: 50,
+                nRedundant: 20,
+                nClustersPerClass: 2,
+                classSep: 0.5
+            });
+        } else {
+            // Сильно нелинейные
+            return makeMoons({ noise: 0.3 });
+        }
+    }
+}
 ```
 
 **Результаты**:
@@ -13120,34 +13872,41 @@ class DynamicComplexityBenchmark:
 
 **Описание**: 1000 агентов должны совместно решить задачу оптимизации маршрутов доставки (VRP).
 
-```python
-def collective_optimization_benchmark():
-    problem = VehicleRoutingProblem(
-        n_customers=100,
-        n_vehicles=10,
-        capacity=50,
-        time_windows=True
-    )
+```typescript
+function collectiveOptimizationBenchmark(): BenchmarkResults {
+    const problem = new VehicleRoutingProblem({
+        nCustomers: 100,
+        nVehicles: 10,
+        capacity: 50,
+        timeWindows: true
+    });
 
-    metrics = {
-        'convergence_time': [],
-        'solution_quality': [],
-        'communication_overhead': [],
-        'consensus_rounds': []
+    const metrics = {
+        convergenceTime: [] as number[],
+        solutionQuality: [] as number[],
+        communicationOverhead: [] as number[],
+        consensusRounds: [] as number[]
+    };
+
+    const systems = [aura, swarmAI, masFramework];
+
+    for (const system of systems) {
+        const start = performance.now();
+        const solution = system.solve(problem);
+        const endTime = performance.now();
+
+        metrics.convergenceTime.push((endTime - start) / 1000);
+        metrics.solutionQuality.push(evaluateSolution(solution));
+        metrics.communicationOverhead.push(
+            system.getMessageCount()
+        );
+        metrics.consensusRounds.push(
+            system.getConsensusIterations()
+        );
     }
 
-    for system in [aura, swarm_ai, mas_framework]:
-        start = time.time()
-        solution = system.solve(problem)
-
-        metrics['convergence_time'].append(time.time() - start)
-        metrics['solution_quality'].append(evaluate_solution(solution))
-        metrics['communication_overhead'].append(
-            system.get_message_count()
-        )
-        metrics['consensus_rounds'].append(
-            system.get_consensus_iterations()
-        )
+    return metrics;
+}
 ```
 
 **Результаты**:
@@ -13167,32 +13926,36 @@ def collective_optimization_benchmark():
 
 **Описание**: Извлечение каузального графа из наблюдательных данных.
 
-```python
-class CausalDiscoveryBenchmark:
-    datasets = [
-        'asia',      # 8 узлов, простой
-        'alarm',     # 37 узлов, медицинский
-        'hailfinder', # 56 узлов, метеорология
-        'synthetic'   # 100 узлов, сгенерированный
-    ]
+```typescript
+class CausalDiscoveryBenchmark {
+    private datasets = [
+        'asia',      // 8 узлов, простой
+        'alarm',     // 37 узлов, медицинский
+        'hailfinder', // 56 узлов, метеорология
+        'synthetic'   // 100 узлов, сгенерированный
+    ];
 
-    def evaluate(self, system):
-        results = {}
-        for dataset in self.datasets:
-            true_dag = load_ground_truth(dataset)
-            data = load_observational_data(dataset)
+    evaluate(system: CausalSystem): Record<string, BenchmarkResult> {
+        const results: Record<string, BenchmarkResult> = {};
 
-            start = time.time()
-            discovered_dag = system.discover_causality(data)
-            time_taken = time.time() - start
+        for (const dataset of this.datasets) {
+            const trueDag = loadGroundTruth(dataset);
+            const data = loadObservationalData(dataset);
+
+            const start = performance.now();
+            const discoveredDag = system.discoverCausality(data);
+            const timeTaken = (performance.now() - start) / 1000;
 
             results[dataset] = {
-                'time': time_taken,
-                'precision': precision(discovered_dag, true_dag),
-                'recall': recall(discovered_dag, true_dag),
-                'shd': structural_hamming_distance(discovered_dag, true_dag)
-            }
-        return results
+                time: timeTaken,
+                precision: precision(discoveredDag, trueDag),
+                recall: recall(discoveredDag, trueDag),
+                shd: structuralHammingDistance(discoveredDag, trueDag)
+            };
+        }
+        return results;
+    }
+}
 ```
 
 **Результаты**:
@@ -13214,40 +13977,45 @@ class CausalDiscoveryBenchmark:
 
 **Описание**: Обучение на 5 примерах для каждого из 10 новых классов.
 
-```python
-def few_shot_benchmark():
-    # Omniglot dataset: 1623 символа из 50 алфавитов
-    support_set = sample_examples(n_way=10, k_shot=5)
-    query_set = sample_examples(n_way=10, k_shot=100)
+```typescript
+function fewShotBenchmark(): Record<string, BenchmarkResult> {
+    // Omniglot dataset: 1623 символа из 50 алфавитов
+    const supportSet = sampleExamples({ nWay: 10, kShot: 5 });
+    const querySet = sampleExamples({ nWay: 10, kShot: 100 });
 
-    systems = {
-        'aura': AURA(),
-        'maml': MAML(),
-        'prototypical': PrototypicalNetworks(),
-        'matching': MatchingNetworks(),
-        'baseline': SimpleFineTuning()
-    }
+    const systems = {
+        'aura': new AURA(),
+        'maml': new MAML(),
+        'prototypical': new PrototypicalNetworks(),
+        'matching': new MatchingNetworks(),
+        'baseline': new SimpleFineTuning()
+    };
 
-    results = {}
-    for name, system in systems.items():
-        # Адаптация на support set
-        adaptation_time = time_it(
-            lambda: system.adapt(support_set)
-        )
+    const results: Record<string, BenchmarkResult> = {};
 
-        # Оценка на query set
-        accuracy = system.evaluate(query_set)
+    for (const [name, system] of Object.entries(systems)) {
+        // Адаптация на support set
+        const adaptationTime = timeIt(
+            () => system.adapt(supportSet)
+        );
 
-        # Дополнительные метрики
-        memory_used = get_memory_usage(system)
-        inference_speed = measure_inference_speed(system, query_set)
+        // Оценка на query set
+        const accuracy = system.evaluate(querySet);
+
+        // Дополнительные метрики
+        const memoryUsed = getMemoryUsage(system);
+        const inferenceSpeed = measureInferenceSpeed(system, querySet);
 
         results[name] = {
-            'accuracy': accuracy,
-            'adaptation_time': adaptation_time,
-            'memory': memory_used,
-            'inference_speed': inference_speed
-        }
+            accuracy: accuracy,
+            adaptationTime: adaptationTime,
+            memory: memoryUsed,
+            inferenceSpeed: inferenceSpeed
+        };
+    }
+
+    return results;
+}
 ```
 
 **Результаты**:
@@ -13264,32 +14032,38 @@ def few_shot_benchmark():
 
 #### Тест: Производительность на Ватт
 
-```python
-def energy_efficiency_benchmark():
-    workload = StandardMLWorkload(
-        tasks=['classification', 'regression', 'clustering'],
-        data_size='10GB',
-        iterations=1000
-    )
+```typescript
+function energyEfficiencyBenchmark(): Record<string, EnergyBenchmarkResult> {
+    const workload = new StandardMLWorkload({
+        tasks: ['classification', 'regression', 'clustering'],
+        dataSize: '10GB',
+        iterations: 1000
+    });
 
-    power_meter = PowerMeter()
+    const powerMeter = new PowerMeter();
 
-    results = {}
-    for system in ['aura', 'tensorflow', 'pytorch', 'jax']:
-        power_meter.start()
+    const results: Record<string, EnergyBenchmarkResult> = {};
+    const systems = ['aura', 'tensorflow', 'pytorch', 'jax'];
 
-        start_time = time.time()
-        accuracy = run_workload(system, workload)
-        duration = time.time() - start_time
+    for (const system of systems) {
+        powerMeter.start();
 
-        energy_consumed = power_meter.stop()  # в джоулях
+        const startTime = performance.now();
+        const accuracy = runWorkload(system, workload);
+        const duration = (performance.now() - startTime) / 1000;
+
+        const energyConsumed = powerMeter.stop();  // в джоулях
 
         results[system] = {
-            'accuracy': accuracy,
-            'time': duration,
-            'energy': energy_consumed,
-            'efficiency': accuracy / energy_consumed  # accuracy per joule
-        }
+            accuracy: accuracy,
+            time: duration,
+            energy: energyConsumed,
+            efficiency: accuracy / energyConsumed  // accuracy per joule
+        };
+    }
+
+    return results;
+}
 ```
 
 **Результаты**:
@@ -13330,29 +14104,36 @@ def energy_efficiency_benchmark():
 
 Увеличиваем задачу пропорционально ресурсам.
 
-```python
-def weak_scaling_test():
-    base_agents = 1000
-    base_problem_size = 100
+```typescript
+function weakScalingTest(): ScalingResult[] {
+    const baseAgents = 1000;
+    const baseProblemSize = 100;
+    const baseTime = 10.0; // базовое время для расчета эффективности
 
-    results = []
-    for scale in [1, 2, 4, 8, 16, 32]:
-        agents = base_agents * scale
-        problem_size = base_problem_size * scale
-        nodes = scale
+    const results: ScalingResult[] = [];
+    const scales = [1, 2, 4, 8, 16, 32];
 
-        time_taken = run_aura(
-            n_agents=agents,
-            problem_size=problem_size,
-            n_nodes=nodes
-        )
+    for (const scale of scales) {
+        const agents = baseAgents * scale;
+        const problemSize = baseProblemSize * scale;
+        const nodes = scale;
 
-        efficiency = base_time / time_taken * 100
-        results.append({
-            'scale': scale,
-            'time': time_taken,
-            'efficiency': efficiency
-        })
+        const timeTaken = runAURA({
+            nAgents: agents,
+            problemSize: problemSize,
+            nNodes: nodes
+        });
+
+        const efficiency = baseTime / timeTaken * 100;
+        results.push({
+            scale: scale,
+            time: timeTaken,
+            efficiency: efficiency
+        });
+    }
+
+    return results;
+}
 ```
 
 | Масштаб | Агенты | Узлы | Время (s) | Эффективность |
@@ -13382,25 +14163,49 @@ def weak_scaling_test():
 
 ### 5.1 Предельные Нагрузки
 
-```python
-class StressTest:
-    def run(self):
-        metrics = {
-            'max_agents': self.find_max_agents(),
-            'max_throughput': self.find_max_throughput(),
-            'breakdown_point': self.find_breakdown_point(),
-            'recovery_time': self.measure_recovery_time()
-        }
-        return metrics
+```typescript
+class StressTest {
+    run(): StressTestMetrics {
+        const metrics = {
+            maxAgents: this.findMaxAgents(),
+            maxThroughput: this.findMaxThroughput(),
+            breakdownPoint: this.findBreakdownPoint(),
+            recoveryTime: this.measureRecoveryTime()
+        };
+        return metrics;
+    }
 
-    def find_max_agents(self):
-        """Находим максимум агентов до деградации"""
-        agents = 1000
-        while True:
-            performance = measure_performance(agents)
-            if performance < 0.8 * baseline_performance:
-                return agents - 1000
-            agents += 1000
+    private findMaxAgents(): number {
+        /**
+         * Находим максимум агентов до деградации
+         */
+        const baselinePerformance = 1.0;
+        let agents = 1000;
+
+        while (true) {
+            const performance = measurePerformance(agents);
+            if (performance < 0.8 * baselinePerformance) {
+                return agents - 1000;
+            }
+            agents += 1000;
+        }
+    }
+
+    private findMaxThroughput(): number {
+        // Реализация поиска максимальной пропускной способности
+        return 0;
+    }
+
+    private findBreakdownPoint(): number {
+        // Реализация поиска точки отказа
+        return 0;
+    }
+
+    private measureRecoveryTime(): number {
+        // Реализация измерения времени восстановления
+        return 0;
+    }
+}
 ```
 
 **Результаты стресс-тестов**:
@@ -13446,12 +14251,12 @@ chaos_scenarios:
 
 **Задача**: Моделирование белковых взаимодействий
 
-```python
-benchmark = ProteinFoldingBenchmark(
-    protein='1CRN',  # Crambin, 46 residues
-    force_field='CHARMM36',
-    simulation_time=100  # nanoseconds
-)
+```typescript
+const benchmark = new ProteinFoldingBenchmark({
+    protein: '1CRN',  // Crambin, 46 residues
+    forceField: 'CHARMM36',
+    simulationTime: 100  // nanoseconds
+});
 ```
 
 | Система | Время | Точность (RMSD) | Энергия (kJ) |
@@ -13465,14 +14270,14 @@ benchmark = ProteinFoldingBenchmark(
 
 **Задача**: Предсказание рыночной волатильности
 
-```python
-market_data = load_historical_data(
-    symbols=['SPX', 'VIX', 'DXY'],
-    period='10Y',
-    frequency='1min'
-)
+```typescript
+const marketData = loadHistoricalData({
+    symbols: ['SPX', 'VIX', 'DXY'],
+    period: '10Y',
+    frequency: '1min'
+});
 
-prediction_horizon = '1D'
+const predictionHorizon = '1D';
 ```
 
 | Метрика | AURA | LSTM | GRU | Transformer | XGBoost |
@@ -13486,13 +14291,13 @@ prediction_horizon = '1D'
 
 **Задача**: Навигация в динамической среде
 
-```python
-environment = DynamicMazeEnvironment(
-    size=(100, 100),
-    n_obstacles=500,
-    n_moving_obstacles=50,
-    goal_distance=85
-)
+```typescript
+const environment = new DynamicMazeEnvironment({
+    size: [100, 100],
+    nObstacles: 500,
+    nMovingObstacles: 50,
+    goalDistance: 85
+});
 ```
 
 | Метрика | AURA | RRT* | A* + replanning | DWA | PRM |
@@ -13506,25 +14311,30 @@ environment = DynamicMazeEnvironment(
 
 ### 7.1 TCO (Total Cost of Ownership)
 
-```python
-def calculate_tco(system, years=3):
-    costs = {
-        'hardware': get_hardware_cost(system),
-        'software_licenses': get_license_cost(system),
-        'development': get_dev_cost(system),
-        'operations': get_ops_cost(system) * years,
-        'training': get_training_cost(system),
-        'energy': get_energy_cost(system) * years
-    }
+```typescript
+function calculateTCO(system: System, years: number = 3): TCOResult {
+    const costs = {
+        hardware: getHardwareCost(system),
+        softwareLicenses: getLicenseCost(system),
+        development: getDevCost(system),
+        operations: getOpsCost(system) * years,
+        training: getTrainingCost(system),
+        energy: getEnergyCost(system) * years
+    };
 
-    benefits = {
-        'productivity': estimate_productivity_gain(system),
-        'quality': estimate_quality_improvement(system),
-        'time_to_market': estimate_ttm_reduction(system)
-    }
+    const benefits = {
+        productivity: estimateProductivityGain(system),
+        quality: estimateQualityImprovement(system),
+        timeToMarket: estimateTTMReduction(system)
+    };
 
-    roi = (sum(benefits.values()) - sum(costs.values())) / sum(costs.values())
-    return costs, benefits, roi
+    const totalCosts = Object.values(costs).reduce((sum, cost) => sum + cost, 0);
+    const totalBenefits = Object.values(benefits).reduce((sum, benefit) => sum + benefit, 0);
+
+    const roi = (totalBenefits - totalCosts) / totalCosts;
+
+    return { costs, benefits, roi };
+}
 ```
 
 | Система | Начальные затраты | Операционные (год) | ROI (3 года) |

@@ -42,28 +42,31 @@ monitoring:
 
 **Описание**: Поток задач классификации с переменной сложностью (от линейно разделимых до высоко нелинейных).
 
-```python
-class DynamicComplexityBenchmark:
-    def generate_task(self, complexity: float):
-        if complexity < 0.3:
-            # Линейно разделимые данные
-            return make_classification(
-                n_features=10,
-                n_redundant=0,
-                n_clusters_per_class=1,
-                class_sep=2.0
-            )
-        elif complexity < 0.7:
-            # Умеренно сложные
-            return make_classification(
-                n_features=50,
-                n_redundant=20,
-                n_clusters_per_class=2,
-                class_sep=0.5
-            )
-        else:
-            # Сильно нелинейные
-            return make_moons(noise=0.3)
+```typescript
+class DynamicComplexityBenchmark {
+    generateTask(complexity: number): Dataset {
+        if (complexity < 0.3) {
+            // Линейно разделимые данные
+            return makeClassification({
+                nFeatures: 10,
+                nRedundant: 0,
+                nClustersPerClass: 1,
+                classSep: 2.0
+            });
+        } else if (complexity < 0.7) {
+            // Умеренно сложные
+            return makeClassification({
+                nFeatures: 50,
+                nRedundant: 20,
+                nClustersPerClass: 2,
+                classSep: 0.5
+            });
+        } else {
+            // Сильно нелинейные
+            return makeMoons({ noise: 0.3 });
+        }
+    }
+}
 ```
 
 **Результаты**:
@@ -84,34 +87,41 @@ class DynamicComplexityBenchmark:
 
 **Описание**: 1000 агентов должны совместно решить задачу оптимизации маршрутов доставки (VRP).
 
-```python
-def collective_optimization_benchmark():
-    problem = VehicleRoutingProblem(
-        n_customers=100,
-        n_vehicles=10,
-        capacity=50,
-        time_windows=True
-    )
+```typescript
+function collectiveOptimizationBenchmark(): BenchmarkResults {
+    const problem = new VehicleRoutingProblem({
+        nCustomers: 100,
+        nVehicles: 10,
+        capacity: 50,
+        timeWindows: true
+    });
 
-    metrics = {
-        'convergence_time': [],
-        'solution_quality': [],
-        'communication_overhead': [],
-        'consensus_rounds': []
+    const metrics = {
+        convergenceTime: [] as number[],
+        solutionQuality: [] as number[],
+        communicationOverhead: [] as number[],
+        consensusRounds: [] as number[]
+    };
+
+    const systems = [aura, swarmAI, masFramework];
+
+    for (const system of systems) {
+        const start = performance.now();
+        const solution = system.solve(problem);
+        const endTime = performance.now();
+
+        metrics.convergenceTime.push((endTime - start) / 1000);
+        metrics.solutionQuality.push(evaluateSolution(solution));
+        metrics.communicationOverhead.push(
+            system.getMessageCount()
+        );
+        metrics.consensusRounds.push(
+            system.getConsensusIterations()
+        );
     }
 
-    for system in [aura, swarm_ai, mas_framework]:
-        start = time.time()
-        solution = system.solve(problem)
-
-        metrics['convergence_time'].append(time.time() - start)
-        metrics['solution_quality'].append(evaluate_solution(solution))
-        metrics['communication_overhead'].append(
-            system.get_message_count()
-        )
-        metrics['consensus_rounds'].append(
-            system.get_consensus_iterations()
-        )
+    return metrics;
+}
 ```
 
 **Результаты**:
@@ -131,32 +141,36 @@ def collective_optimization_benchmark():
 
 **Описание**: Извлечение каузального графа из наблюдательных данных.
 
-```python
-class CausalDiscoveryBenchmark:
-    datasets = [
-        'asia',      # 8 узлов, простой
-        'alarm',     # 37 узлов, медицинский
-        'hailfinder', # 56 узлов, метеорология
-        'synthetic'   # 100 узлов, сгенерированный
-    ]
+```typescript
+class CausalDiscoveryBenchmark {
+    private datasets = [
+        'asia',      // 8 узлов, простой
+        'alarm',     // 37 узлов, медицинский
+        'hailfinder', // 56 узлов, метеорология
+        'synthetic'   // 100 узлов, сгенерированный
+    ];
 
-    def evaluate(self, system):
-        results = {}
-        for dataset in self.datasets:
-            true_dag = load_ground_truth(dataset)
-            data = load_observational_data(dataset)
+    evaluate(system: CausalSystem): Record<string, BenchmarkResult> {
+        const results: Record<string, BenchmarkResult> = {};
 
-            start = time.time()
-            discovered_dag = system.discover_causality(data)
-            time_taken = time.time() - start
+        for (const dataset of this.datasets) {
+            const trueDag = loadGroundTruth(dataset);
+            const data = loadObservationalData(dataset);
+
+            const start = performance.now();
+            const discoveredDag = system.discoverCausality(data);
+            const timeTaken = (performance.now() - start) / 1000;
 
             results[dataset] = {
-                'time': time_taken,
-                'precision': precision(discovered_dag, true_dag),
-                'recall': recall(discovered_dag, true_dag),
-                'shd': structural_hamming_distance(discovered_dag, true_dag)
-            }
-        return results
+                time: timeTaken,
+                precision: precision(discoveredDag, trueDag),
+                recall: recall(discoveredDag, trueDag),
+                shd: structuralHammingDistance(discoveredDag, trueDag)
+            };
+        }
+        return results;
+    }
+}
 ```
 
 **Результаты**:
@@ -178,40 +192,45 @@ class CausalDiscoveryBenchmark:
 
 **Описание**: Обучение на 5 примерах для каждого из 10 новых классов.
 
-```python
-def few_shot_benchmark():
-    # Omniglot dataset: 1623 символа из 50 алфавитов
-    support_set = sample_examples(n_way=10, k_shot=5)
-    query_set = sample_examples(n_way=10, k_shot=100)
+```typescript
+function fewShotBenchmark(): Record<string, BenchmarkResult> {
+    // Omniglot dataset: 1623 символа из 50 алфавитов
+    const supportSet = sampleExamples({ nWay: 10, kShot: 5 });
+    const querySet = sampleExamples({ nWay: 10, kShot: 100 });
 
-    systems = {
-        'aura': AURA(),
-        'maml': MAML(),
-        'prototypical': PrototypicalNetworks(),
-        'matching': MatchingNetworks(),
-        'baseline': SimpleFineTuning()
-    }
+    const systems = {
+        'aura': new AURA(),
+        'maml': new MAML(),
+        'prototypical': new PrototypicalNetworks(),
+        'matching': new MatchingNetworks(),
+        'baseline': new SimpleFineTuning()
+    };
 
-    results = {}
-    for name, system in systems.items():
-        # Адаптация на support set
-        adaptation_time = time_it(
-            lambda: system.adapt(support_set)
-        )
+    const results: Record<string, BenchmarkResult> = {};
 
-        # Оценка на query set
-        accuracy = system.evaluate(query_set)
+    for (const [name, system] of Object.entries(systems)) {
+        // Адаптация на support set
+        const adaptationTime = timeIt(
+            () => system.adapt(supportSet)
+        );
 
-        # Дополнительные метрики
-        memory_used = get_memory_usage(system)
-        inference_speed = measure_inference_speed(system, query_set)
+        // Оценка на query set
+        const accuracy = system.evaluate(querySet);
+
+        // Дополнительные метрики
+        const memoryUsed = getMemoryUsage(system);
+        const inferenceSpeed = measureInferenceSpeed(system, querySet);
 
         results[name] = {
-            'accuracy': accuracy,
-            'adaptation_time': adaptation_time,
-            'memory': memory_used,
-            'inference_speed': inference_speed
-        }
+            accuracy: accuracy,
+            adaptationTime: adaptationTime,
+            memory: memoryUsed,
+            inferenceSpeed: inferenceSpeed
+        };
+    }
+
+    return results;
+}
 ```
 
 **Результаты**:
@@ -228,32 +247,38 @@ def few_shot_benchmark():
 
 #### Тест: Производительность на Ватт
 
-```python
-def energy_efficiency_benchmark():
-    workload = StandardMLWorkload(
-        tasks=['classification', 'regression', 'clustering'],
-        data_size='10GB',
-        iterations=1000
-    )
+```typescript
+function energyEfficiencyBenchmark(): Record<string, EnergyBenchmarkResult> {
+    const workload = new StandardMLWorkload({
+        tasks: ['classification', 'regression', 'clustering'],
+        dataSize: '10GB',
+        iterations: 1000
+    });
 
-    power_meter = PowerMeter()
+    const powerMeter = new PowerMeter();
 
-    results = {}
-    for system in ['aura', 'tensorflow', 'pytorch', 'jax']:
-        power_meter.start()
+    const results: Record<string, EnergyBenchmarkResult> = {};
+    const systems = ['aura', 'tensorflow', 'pytorch', 'jax'];
 
-        start_time = time.time()
-        accuracy = run_workload(system, workload)
-        duration = time.time() - start_time
+    for (const system of systems) {
+        powerMeter.start();
 
-        energy_consumed = power_meter.stop()  # в джоулях
+        const startTime = performance.now();
+        const accuracy = runWorkload(system, workload);
+        const duration = (performance.now() - startTime) / 1000;
+
+        const energyConsumed = powerMeter.stop();  // в джоулях
 
         results[system] = {
-            'accuracy': accuracy,
-            'time': duration,
-            'energy': energy_consumed,
-            'efficiency': accuracy / energy_consumed  # accuracy per joule
-        }
+            accuracy: accuracy,
+            time: duration,
+            energy: energyConsumed,
+            efficiency: accuracy / energyConsumed  // accuracy per joule
+        };
+    }
+
+    return results;
+}
 ```
 
 **Результаты**:
@@ -294,29 +319,36 @@ def energy_efficiency_benchmark():
 
 Увеличиваем задачу пропорционально ресурсам.
 
-```python
-def weak_scaling_test():
-    base_agents = 1000
-    base_problem_size = 100
+```typescript
+function weakScalingTest(): ScalingResult[] {
+    const baseAgents = 1000;
+    const baseProblemSize = 100;
+    const baseTime = 10.0; // базовое время для расчета эффективности
 
-    results = []
-    for scale in [1, 2, 4, 8, 16, 32]:
-        agents = base_agents * scale
-        problem_size = base_problem_size * scale
-        nodes = scale
+    const results: ScalingResult[] = [];
+    const scales = [1, 2, 4, 8, 16, 32];
 
-        time_taken = run_aura(
-            n_agents=agents,
-            problem_size=problem_size,
-            n_nodes=nodes
-        )
+    for (const scale of scales) {
+        const agents = baseAgents * scale;
+        const problemSize = baseProblemSize * scale;
+        const nodes = scale;
 
-        efficiency = base_time / time_taken * 100
-        results.append({
-            'scale': scale,
-            'time': time_taken,
-            'efficiency': efficiency
-        })
+        const timeTaken = runAURA({
+            nAgents: agents,
+            problemSize: problemSize,
+            nNodes: nodes
+        });
+
+        const efficiency = baseTime / timeTaken * 100;
+        results.push({
+            scale: scale,
+            time: timeTaken,
+            efficiency: efficiency
+        });
+    }
+
+    return results;
+}
 ```
 
 | Масштаб | Агенты | Узлы | Время (s) | Эффективность |
@@ -346,25 +378,49 @@ def weak_scaling_test():
 
 ### 5.1 Предельные Нагрузки
 
-```python
-class StressTest:
-    def run(self):
-        metrics = {
-            'max_agents': self.find_max_agents(),
-            'max_throughput': self.find_max_throughput(),
-            'breakdown_point': self.find_breakdown_point(),
-            'recovery_time': self.measure_recovery_time()
-        }
-        return metrics
+```typescript
+class StressTest {
+    run(): StressTestMetrics {
+        const metrics = {
+            maxAgents: this.findMaxAgents(),
+            maxThroughput: this.findMaxThroughput(),
+            breakdownPoint: this.findBreakdownPoint(),
+            recoveryTime: this.measureRecoveryTime()
+        };
+        return metrics;
+    }
 
-    def find_max_agents(self):
-        """Находим максимум агентов до деградации"""
-        agents = 1000
-        while True:
-            performance = measure_performance(agents)
-            if performance < 0.8 * baseline_performance:
-                return agents - 1000
-            agents += 1000
+    private findMaxAgents(): number {
+        /**
+         * Находим максимум агентов до деградации
+         */
+        const baselinePerformance = 1.0;
+        let agents = 1000;
+
+        while (true) {
+            const performance = measurePerformance(agents);
+            if (performance < 0.8 * baselinePerformance) {
+                return agents - 1000;
+            }
+            agents += 1000;
+        }
+    }
+
+    private findMaxThroughput(): number {
+        // Реализация поиска максимальной пропускной способности
+        return 0;
+    }
+
+    private findBreakdownPoint(): number {
+        // Реализация поиска точки отказа
+        return 0;
+    }
+
+    private measureRecoveryTime(): number {
+        // Реализация измерения времени восстановления
+        return 0;
+    }
+}
 ```
 
 **Результаты стресс-тестов**:
@@ -410,12 +466,12 @@ chaos_scenarios:
 
 **Задача**: Моделирование белковых взаимодействий
 
-```python
-benchmark = ProteinFoldingBenchmark(
-    protein='1CRN',  # Crambin, 46 residues
-    force_field='CHARMM36',
-    simulation_time=100  # nanoseconds
-)
+```typescript
+const benchmark = new ProteinFoldingBenchmark({
+    protein: '1CRN',  // Crambin, 46 residues
+    forceField: 'CHARMM36',
+    simulationTime: 100  // nanoseconds
+});
 ```
 
 | Система | Время | Точность (RMSD) | Энергия (kJ) |
@@ -429,14 +485,14 @@ benchmark = ProteinFoldingBenchmark(
 
 **Задача**: Предсказание рыночной волатильности
 
-```python
-market_data = load_historical_data(
-    symbols=['SPX', 'VIX', 'DXY'],
-    period='10Y',
-    frequency='1min'
-)
+```typescript
+const marketData = loadHistoricalData({
+    symbols: ['SPX', 'VIX', 'DXY'],
+    period: '10Y',
+    frequency: '1min'
+});
 
-prediction_horizon = '1D'
+const predictionHorizon = '1D';
 ```
 
 | Метрика | AURA | LSTM | GRU | Transformer | XGBoost |
@@ -450,13 +506,13 @@ prediction_horizon = '1D'
 
 **Задача**: Навигация в динамической среде
 
-```python
-environment = DynamicMazeEnvironment(
-    size=(100, 100),
-    n_obstacles=500,
-    n_moving_obstacles=50,
-    goal_distance=85
-)
+```typescript
+const environment = new DynamicMazeEnvironment({
+    size: [100, 100],
+    nObstacles: 500,
+    nMovingObstacles: 50,
+    goalDistance: 85
+});
 ```
 
 | Метрика | AURA | RRT* | A* + replanning | DWA | PRM |
@@ -470,25 +526,30 @@ environment = DynamicMazeEnvironment(
 
 ### 7.1 TCO (Total Cost of Ownership)
 
-```python
-def calculate_tco(system, years=3):
-    costs = {
-        'hardware': get_hardware_cost(system),
-        'software_licenses': get_license_cost(system),
-        'development': get_dev_cost(system),
-        'operations': get_ops_cost(system) * years,
-        'training': get_training_cost(system),
-        'energy': get_energy_cost(system) * years
-    }
+```typescript
+function calculateTCO(system: System, years: number = 3): TCOResult {
+    const costs = {
+        hardware: getHardwareCost(system),
+        softwareLicenses: getLicenseCost(system),
+        development: getDevCost(system),
+        operations: getOpsCost(system) * years,
+        training: getTrainingCost(system),
+        energy: getEnergyCost(system) * years
+    };
 
-    benefits = {
-        'productivity': estimate_productivity_gain(system),
-        'quality': estimate_quality_improvement(system),
-        'time_to_market': estimate_ttm_reduction(system)
-    }
+    const benefits = {
+        productivity: estimateProductivityGain(system),
+        quality: estimateQualityImprovement(system),
+        timeToMarket: estimateTTMReduction(system)
+    };
 
-    roi = (sum(benefits.values()) - sum(costs.values())) / sum(costs.values())
-    return costs, benefits, roi
+    const totalCosts = Object.values(costs).reduce((sum, cost) => sum + cost, 0);
+    const totalBenefits = Object.values(benefits).reduce((sum, benefit) => sum + benefit, 0);
+
+    const roi = (totalBenefits - totalCosts) / totalCosts;
+
+    return { costs, benefits, roi };
+}
 ```
 
 | Система | Начальные затраты | Операционные (год) | ROI (3 года) |

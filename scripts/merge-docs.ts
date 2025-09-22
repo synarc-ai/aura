@@ -9,8 +9,8 @@ import { join, dirname } from 'path';
  * Версия берётся из package.json
  */
 
-const V03_DIR = join(import.meta.dir, '..');
-const OUTPUT_FILE = join(import.meta.dir, '..', 'full.md');
+const V03_DIR = join(import.meta.dir, '..', 'docs', 'ru');
+const OUTPUT_FILE = join(import.meta.dir, '..', 'docs', 'ru', 'full.md');
 const PACKAGE_JSON_PATH = join(V03_DIR, 'package.json');
 
 /**

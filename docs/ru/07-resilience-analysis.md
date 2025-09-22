@@ -412,74 +412,208 @@ Competence(level) = {
 
 ### 22.1 Общий Алгоритм Обнаружения
 
-```python
-def DetectParadox(state, context):
-    # 1. Проверка логической согласованности
-    if CheckConsistency(state) == False:
-        return ParadoxType.LOGICAL
+```typescript
+enum ParadoxType {
+    LOGICAL = 'LOGICAL',
+    CAUSAL = 'CAUSAL',
+    SELF_REFERENCE = 'SELF_REFERENCE',
+    RESOURCE = 'RESOURCE',
+    TEMPORAL = 'TEMPORAL'
+}
 
-    # 2. Проверка каузальных циклов
-    if DetectCausalLoop(state.causal_graph):
-        return ParadoxType.CAUSAL
+interface State {
+    causal_graph: any;
+    description: string;
+    // другие свойства
+}
 
-    # 3. Проверка самореференции
-    if ContainsSelfReference(state.description):
-        return ParadoxType.SELF_REFERENCE
+function detectParadox(state: State, context: any): ParadoxType | null {
+    // 1. Проверка логической согласованности
+    if (checkConsistency(state) === false) {
+        return ParadoxType.LOGICAL;
+    }
 
-    # 4. Проверка ресурсных ограничений
-    if ResourceRequirement(state) == INFINITE:
-        return ParadoxType.RESOURCE
+    // 2. Проверка каузальных циклов
+    if (detectCausalLoop(state.causal_graph)) {
+        return ParadoxType.CAUSAL;
+    }
 
-    return None
+    // 3. Проверка самореференции
+    if (containsSelfReference(state.description)) {
+        return ParadoxType.SELF_REFERENCE;
+    }
+
+    // 4. Проверка ресурсных ограничений
+    if (resourceRequirement(state) === 'INFINITE') {
+        return ParadoxType.RESOURCE;
+    }
+
+    return null;
+}
+
+function checkConsistency(state: State): boolean {
+    // Реализация проверки
+    return true;
+}
+
+function detectCausalLoop(causalGraph: any): boolean {
+    // Реализация обнаружения цикла
+    return false;
+}
+
+function containsSelfReference(description: string): boolean {
+    // Реализация проверки
+    return false;
+}
+
+function resourceRequirement(state: State): string {
+    // Реализация оценки ресурсов
+    return 'FINITE';
+}
 ```
 
 ### 22.2 Механизм Разрешения
 
-```python
-def ResolveParadox(paradox_type, state):
-    resolution_strategies = {
-        ParadoxType.LOGICAL: ApplyParaconsistentLogic,
-        ParadoxType.CAUSAL: BreakCausalLoop,
-        ParadoxType.SELF_REFERENCE: IntroduceTypeHierarchy,
-        ParadoxType.RESOURCE: ApplyResourceBounds,
-        ParadoxType.TEMPORAL: EnforceTimelineConsistency
-    }
+```typescript
+type ResolutionStrategy = (state: State) => any;
 
-    strategy = resolution_strategies.get(paradox_type)
-    if strategy:
-        return strategy(state)
-    else:
-        return IsolateAndContain(state)
+function resolveParadox(paradoxType: ParadoxType, state: State): any {
+    const resolutionStrategies: Record<ParadoxType, ResolutionStrategy> = {
+        [ParadoxType.LOGICAL]: applyParaconsistentLogic,
+        [ParadoxType.CAUSAL]: breakCausalLoop,
+        [ParadoxType.SELF_REFERENCE]: introduceTypeHierarchy,
+        [ParadoxType.RESOURCE]: applyResourceBounds,
+        [ParadoxType.TEMPORAL]: enforceTimelineConsistency
+    };
+
+    const strategy = resolutionStrategies[paradoxType];
+    if (strategy) {
+        return strategy(state);
+    } else {
+        return isolateAndContain(state);
+    }
+}
+
+function applyParaconsistentLogic(state: State): any {
+    // Реализация
+    return null;
+}
+
+function breakCausalLoop(state: State): any {
+    // Реализация
+    return null;
+}
+
+function introduceTypeHierarchy(state: State): any {
+    // Реализация
+    return null;
+}
+
+function applyResourceBounds(state: State): any {
+    // Реализация
+    return null;
+}
+
+function enforceTimelineConsistency(state: State): any {
+    // Реализация
+    return null;
+}
+
+function isolateAndContain(state: State): any {
+    // Реализация
+    return null;
+}
 ```
 
 ### 22.3 Превентивные Меры
 
-```python
-class ParadoxPrevention:
-    def __init__(self):
-        self.invariants = [
-            ConsistencyInvariant(),
-            CausalityInvariant(),
-            ResourceBoundInvariant(),
-            TypeSafetyInvariant()
-        ]
+```typescript
+interface Invariant {
+    check(state: State): boolean;
+    violationType: string;
+}
 
-    def ValidateAction(self, action, state):
-        future_state = Simulate(action, state)
+class ConsistencyInvariant implements Invariant {
+    violationType = 'consistency';
+    check(state: State): boolean {
+        // Реализация
+        return true;
+    }
+}
 
-        for invariant in self.invariants:
-            if not invariant.check(future_state):
-                return False, invariant.violation_type
+class CausalityInvariant implements Invariant {
+    violationType = 'causality';
+    check(state: State): boolean {
+        // Реализация
+        return true;
+    }
+}
 
-        return True, None
+class ResourceBoundInvariant implements Invariant {
+    violationType = 'resource_bound';
+    check(state: State): boolean {
+        // Реализация
+        return true;
+    }
+}
 
-    def SafeExecute(self, action, state):
-        valid, violation = self.ValidateAction(action, state)
+class TypeSafetyInvariant implements Invariant {
+    violationType = 'type_safety';
+    check(state: State): boolean {
+        // Реализация
+        return true;
+    }
+}
 
-        if valid:
-            return Execute(action, state)
-        else:
-            return HandleViolation(violation, action, state)
+class ParadoxPrevention {
+    private invariants: Invariant[];
+
+    constructor() {
+        this.invariants = [
+            new ConsistencyInvariant(),
+            new CausalityInvariant(),
+            new ResourceBoundInvariant(),
+            new TypeSafetyInvariant()
+        ];
+    }
+
+    validateAction(action: any, state: State): [boolean, string | null] {
+        const futureState = simulate(action, state);
+
+        for (const invariant of this.invariants) {
+            if (!invariant.check(futureState)) {
+                return [false, invariant.violationType];
+            }
+        }
+
+        return [true, null];
+    }
+
+    safeExecute(action: any, state: State): any {
+        const [valid, violation] = this.validateAction(action, state);
+
+        if (valid) {
+            return execute(action, state);
+        } else {
+            return handleViolation(violation, action, state);
+        }
+    }
+}
+
+function simulate(action: any, state: State): State {
+    // Реализация симуляции
+    return state;
+}
+
+function execute(action: any, state: State): any {
+    // Реализация выполнения
+    return null;
+}
+
+function handleViolation(violation: string | null, action: any, state: State): any {
+    // Обработка нарушения
+    return null;
+}
 ```
 
 ## Обобщённые Принципы Устойчивости
@@ -593,24 +727,47 @@ Coherence(t) = Tr(ρ^2(t)) ≥ Coherence_min > 0
 **Проблема**: Максимизация CPS приводит к созданию clickbait.
 
 **Решение AURA**:
-```python
-def ResolveGoodhart():
-    # Многокритериальная оптимизация
-    metrics = [
+```typescript
+function resolveGoodhart(history: any[], context: any): any {
+    // Многокритериальная оптимизация
+    const metrics = [
         'clicks_per_second',
         'user_satisfaction',
         'information_quality',
         'long_term_engagement'
-    ]
+    ];
 
-    # Динамические веса
-    weights = AdaptiveWeights(history, context)
+    // Динамические веса
+    const weights = adaptiveWeights(history, context);
 
-    # Шум для предотвращения переоптимизации
-    for metric in metrics:
-        metric_value += noise(σ=0.1)
+    // Шум для предотвращения переоптимизации
+    const noisyMetrics = metrics.map(metric => {
+        const metricValue = getMetricValue(metric);
+        return metricValue + noise(0.1);
+    });
 
-    return ParetOptimal(metrics, weights)
+    return paretoOptimal(noisyMetrics, weights);
+}
+
+function adaptiveWeights(history: any[], context: any): number[] {
+    // Реализация адаптивных весов
+    return [0.25, 0.25, 0.25, 0.25];
+}
+
+function noise(sigma: number): number {
+    // Генерация шума
+    return (Math.random() - 0.5) * 2 * sigma;
+}
+
+function getMetricValue(metric: string): number {
+    // Получение значения метрики
+    return 0;
+}
+
+function paretoOptimal(metrics: number[], weights: number[]): any {
+    // Реализация Pareto оптимальности
+    return null;
+}
 ```
 
 ### 24.2 Пример: Дилемма Заключённого в Мультиагентной Системе
@@ -618,28 +775,44 @@ def ResolveGoodhart():
 **Сценарий**: Несколько агентов AURA должны выбрать: сотрудничать или предать.
 
 **Решение**:
-```python
-class ReputationBasedCooperation:
-    def __init__(self):
-        self.reputation = {}
-        self.threshold = 0.6
+```typescript
+enum Action {
+    COOPERATE = 'COOPERATE',
+    DEFECT = 'DEFECT'
+}
 
-    def decide(self, agent_id, history):
-        # Обновляем репутацию
-        self.update_reputation(agent_id, history)
+class ReputationBasedCooperation {
+    private reputation: Map<string, number>;
+    private threshold: number;
 
-        # Стратегия TIT-FOR-TAT с прощением
-        if self.reputation[agent_id] > self.threshold:
-            return COOPERATE
-        elif random() < 0.1:  # 10% шанс прощения
-            return COOPERATE
-        else:
-            return DEFECT
+    constructor() {
+        this.reputation = new Map();
+        this.threshold = 0.6;
+    }
 
-    def update_reputation(self, agent_id, action):
-        α = 0.9  # фактор забывания
-        reward = 1 if action == COOPERATE else -1
-        self.reputation[agent_id] = α * self.reputation.get(agent_id, 0.5) + (1-α) * reward
+    decide(agentId: string, history: any[]): Action {
+        // Обновляем репутацию
+        this.updateReputation(agentId, history);
+
+        // Стратегия TIT-FOR-TAT с прощением
+        const agentReputation = this.reputation.get(agentId) || 0.5;
+
+        if (agentReputation > this.threshold) {
+            return Action.COOPERATE;
+        } else if (Math.random() < 0.1) {  // 10% шанс прощения
+            return Action.COOPERATE;
+        } else {
+            return Action.DEFECT;
+        }
+    }
+
+    updateReputation(agentId: string, action: Action): void {
+        const alpha = 0.9;  // фактор забывания
+        const reward = action === Action.COOPERATE ? 1 : -1;
+        const currentRep = this.reputation.get(agentId) || 0.5;
+        this.reputation.set(agentId, alpha * currentRep + (1 - alpha) * reward);
+    }
+}
 ```
 
 ## 25. Режимы Деградации и Graceful Degradation
@@ -760,32 +933,83 @@ class TemporalDegradation {
 
 ### 25.5 Механизмы Восстановления
 
-```python
-class RecoveryMechanism:
-    def __init__(self):
-        self.checkpoints = []
-        self.recovery_strategies = {
-            'minor': self.quick_fix,
-            'major': self.rollback,
-            'critical': self.rebuild,
-            'catastrophic': self.factory_reset
-        }
+```typescript
+type DamageLevel = 'minor' | 'major' | 'critical' | 'catastrophic';
+type RecoveryStrategy = () => any;
 
-    def assess_damage(self) -> str:
-        integrity = self.check_system_integrity()
-        if integrity > 0.9: return 'minor'
-        elif integrity > 0.7: return 'major'
-        elif integrity > 0.3: return 'critical'
-        else: return 'catastrophic'
+class RecoveryMechanism {
+    private checkpoints: any[];
+    private recoveryStrategies: Record<DamageLevel, RecoveryStrategy>;
 
-    def recover(self):
-        damage_level = self.assess_damage()
-        strategy = self.recovery_strategies[damage_level]
-        return strategy()
+    constructor() {
+        this.checkpoints = [];
+        this.recoveryStrategies = {
+            'minor': () => this.quickFix(),
+            'major': () => this.rollback(),
+            'critical': () => this.rebuild(),
+            'catastrophic': () => this.factoryReset()
+        };
+    }
 
-    def quick_fix(self):
-        # Локальные исправления
-        return self.repair_corrupted_components()
+    assessDamage(): DamageLevel {
+        const integrity = this.checkSystemIntegrity();
+        if (integrity > 0.9) return 'minor';
+        else if (integrity > 0.7) return 'major';
+        else if (integrity > 0.3) return 'critical';
+        else return 'catastrophic';
+    }
+
+    recover(): any {
+        const damageLevel = this.assessDamage();
+        const strategy = this.recoveryStrategies[damageLevel];
+        return strategy();
+    }
+
+    quickFix(): any {
+        // Локальные исправления
+        return this.repairCorruptedComponents();
+    }
+
+    private checkSystemIntegrity(): number {
+        // Реализация проверки целостности
+        return 1.0;
+    }
+
+    private rollback(): any {
+        // Откат к предыдущей версии
+        return this.restoreCheckpoint(this.checkpoints[this.checkpoints.length - 1]);
+    }
+
+    private rebuild(): any {
+        // Перестройка системы
+        return this.reconstructFromInvariants();
+    }
+
+    private factoryReset(): any {
+        // Сброс к заводским настройкам
+        return this.initializeFromScratch();
+    }
+
+    private repairCorruptedComponents(): any {
+        // Восстановление повреждённых компонентов
+        return null;
+    }
+
+    private restoreCheckpoint(checkpoint: any): any {
+        // Восстановление из checkpoint
+        return null;
+    }
+
+    private reconstructFromInvariants(): any {
+        // Перестроение из инвариантов
+        return null;
+    }
+
+    private initializeFromScratch(): any {
+        // Инициализация с нуля
+        return null;
+    }
+}
 
     def rollback(self):
         # Откат к последнему стабильному состоянию

@@ -479,169 +479,278 @@ E(t) = ⟨ψ(t)|H|ψ(t)⟩ ≤ E_max ∀t
 
 ### 14.1 Архитектура Системы Мониторинга
 
-```python
-class SafetyMonitoringSystem:
-    def __init__(self):
-        self.sensors = {
-            'resource': ResourceMonitor(),
-            'behavior': BehaviorAnalyzer(),
-            'integrity': IntegrityChecker(),
-            'causality': CausalityTracker()
+```typescript
+class SafetyMonitoringSystem {
+    private sensors: Record<string, any>;
+    private detectors: Record<string, any>;
+    private response: SafetyResponseUnit;
+    private log: AuditLogger;
+
+    constructor() {
+        this.sensors = {
+            'resource': new ResourceMonitor(),
+            'behavior': new BehaviorAnalyzer(),
+            'integrity': new IntegrityChecker(),
+            'causality': new CausalityTracker()
+        };
+
+        this.detectors = {
+            'anomaly': new AnomalyDetector(),
+            'attack': new AttackDetector(),
+            'drift': new DriftDetector(),
+            'paradox': new ParadoxDetector()
+        };
+
+        this.response = new SafetyResponseUnit();
+        this.log = new AuditLogger();
+    }
+
+    monitor(state: any, dt: number = 0.001): any[] {
+        /**
+         * Основной цикл мониторинга
+         * dt: временной шаг в секундах (1 мс по умолчанию)
+         */
+        // Сбор данных
+        const sensorData = this.collectSensorData(state);
+
+        // Анализ
+        const threats = this.analyzeThreats(sensorData);
+
+        // Ответ
+        if (threats.length > 0) {
+            this.response.handle(threats, state);
         }
 
-        self.detectors = {
-            'anomaly': AnomalyDetector(),
-            'attack': AttackDetector(),
-            'drift': DriftDetector(),
-            'paradox': ParadoxDetector()
-        }
+        // Логирование
+        this.log.record(sensorData, threats);
 
-        self.response = SafetyResponseUnit()
-        self.log = AuditLogger()
-
-    def monitor(self, state, dt=0.001):
-        """
-        Основной цикл мониторинга
-        dt: временной шаг в секундах (1 мс по умолчанию)
-        """
-        # Сбор данных
-        sensor_data = self.collect_sensor_data(state)
-
-        # Анализ
-        threats = self.analyze_threats(sensor_data)
-
-        # Ответ
-        if threats:
-            self.response.handle(threats, state)
-
-        # Логирование
-        self.log.record(sensor_data, threats)
-
-        return threats
+        return threats;
+    }
+}
 ```
 
 ### 14.2 Детектор Аномалий
 
-```python
-class AnomalyDetector:
-    def __init__(self, window_size=1000):
-        self.window_size = window_size
-        self.history = deque(maxlen=window_size)
-        self.model = IsolationForest(contamination=0.01)
-        self.threshold = 3.5  # стандартных отклонений
+```typescript
+class AnomalyDetector {
+    private windowSize: number;
+    private history: number[][];
+    private model: IsolationForest;
+    private threshold: number; // стандартных отклонений
 
-    def detect(self, features):
-        """
-        Обнаружение аномалий в режиме реального времени
-        """
-        self.history.append(features)
+    constructor(windowSize: number = 1000) {
+        this.windowSize = windowSize;
+        this.history = [];
+        this.model = new IsolationForest({ contamination: 0.01 });
+        this.threshold = 3.5;
+    }
 
-        if len(self.history) < 100:
-            return None  # Недостаточно данных
+    detect(features: number[]): any | null {
+        /**
+         * Обнаружение аномалий в режиме реального времени
+         */
+        this.history.push(features);
+        if (this.history.length > this.windowSize) {
+            this.history.shift();
+        }
 
-        # Z-score для быстрого обнаружения
-        mean = np.mean(self.history, axis=0)
-        std = np.std(self.history, axis=0)
-        z_score = np.abs((features - mean) / (std + 1e-10))
+        if (this.history.length < 100) {
+            return null;  // Недостаточно данных
+        }
 
-        if np.any(z_score > self.threshold):
+        // Z-score для быстрого обнаружения
+        const mean = this.calculateMean(this.history);
+        const std = this.calculateStd(this.history, mean);
+        const zScore = features.map((f, i) =>
+            Math.abs((f - mean[i]) / (std[i] + 1e-10))
+        );
+
+        if (zScore.some(z => z > this.threshold)) {
             return {
-                'type': 'statistical',
-                'severity': np.max(z_score) / self.threshold,
-                'features': features,
-                'z_scores': z_score
-            }
+                type: 'statistical',
+                severity: Math.max(...zScore) / this.threshold,
+                features: features,
+                z_scores: zScore
+            };
+        }
 
-        # Machine learning для сложных паттернов
-        if len(self.history) == self.window_size:
-            self.model.fit(self.history)
-            anomaly_score = self.model.decision_function([features])[0]
+        // Machine learning для сложных паттернов
+        if (this.history.length === this.windowSize) {
+            this.model.fit(this.history);
+            const anomalyScore = this.model.decisionFunction([features])[0];
 
-            if anomaly_score < -0.5:
+            if (anomalyScore < -0.5) {
                 return {
-                    'type': 'pattern',
-                    'severity': abs(anomaly_score),
-                    'features': features
-                }
+                    type: 'pattern',
+                    severity: Math.abs(anomalyScore),
+                    features: features
+                };
+            }
+        }
 
-        return None
+        return null;
+    }
+
+    private calculateMean(data: number[][]): number[] {
+        const featureCount = data[0].length;
+        const means = new Array(featureCount).fill(0);
+
+        for (const row of data) {
+            for (let i = 0; i < featureCount; i++) {
+                means[i] += row[i];
+            }
+        }
+
+        return means.map(sum => sum / data.length);
+    }
+
+    private calculateStd(data: number[][], means: number[]): number[] {
+        const featureCount = data[0].length;
+        const variances = new Array(featureCount).fill(0);
+
+        for (const row of data) {
+            for (let i = 0; i < featureCount; i++) {
+                variances[i] += Math.pow(row[i] - means[i], 2);
+            }
+        }
+
+        return variances.map(variance => Math.sqrt(variance / data.length));
+    }
+}
 ```
 
 ### 14.3 Модуль Быстрого Реагирования
 
-```python
-class SafetyResponseUnit:
-    def __init__(self):
-        self.response_time_target = 0.010  # 10 мс
-        self.strategies = {
-            'low': self.minimal_intervention,
-            'medium': self.moderate_intervention,
-            'high': self.aggressive_intervention,
-            'critical': self.emergency_shutdown
+```typescript
+class SafetyResponseUnit {
+    private responseTimeTarget: number; // 10 мс
+    private strategies: Record<string, (threat: any, state: any) => Promise<any>>;
+
+    constructor() {
+        this.responseTimeTarget = 0.010;
+        this.strategies = {
+            'low': this.minimalIntervention.bind(this),
+            'medium': this.moderateIntervention.bind(this),
+            'high': this.aggressiveIntervention.bind(this),
+            'critical': this.emergencyShutdown.bind(this)
+        };
+    }
+
+    async handle(threat: any, state: any, maxTime: number = 0.010): Promise<any> {
+        /**
+         * Обработка угрозы с гарантированным временем ответа
+         */
+        const startTime = performance.now();
+
+        const severity = this.assessSeverity(threat);
+        const strategy = this.selectStrategy(severity, maxTime);
+
+        // Параллельное выполнение мер
+        const promises = [
+            this.isolateThreat(threat),
+            this.backupState(state),
+            this.notifyOperators(threat),
+            strategy(threat, state)
+        ];
+
+        // Ожидание с таймаутом
+        const results = await Promise.allSettled(
+            promises.map(p =>
+                Promise.race([
+                    p,
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Timeout')), maxTime * 1000)
+                    )
+                ])
+            )
+        );
+
+        const responseTime = (performance.now() - startTime) / 1000;
+
+        if (responseTime > maxTime) {
+            await this.emergencyShutdown(threat, state);
         }
-
-    def handle(self, threat, state, max_time=0.010):
-        """
-        Обработка угрозы с гарантированным временем ответа
-        """
-        start_time = time.perf_counter()
-
-        severity = self.assess_severity(threat)
-        strategy = self.select_strategy(severity, max_time)
-
-        # Параллельное выполнение мер
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = [
-                executor.submit(self.isolate_threat, threat),
-                executor.submit(self.backup_state, state),
-                executor.submit(self.notify_operators, threat),
-                executor.submit(strategy, threat, state)
-            ]
-
-            # Ожидание с таймаутом
-            done, not_done = wait(futures, timeout=max_time)
-
-            # Отмена незавершённых задач
-            for future in not_done:
-                future.cancel()
-
-        response_time = time.perf_counter() - start_time
-
-        if response_time > max_time:
-            self.emergency_shutdown(threat, state)
 
         return {
-            'response_time': response_time,
-            'actions_taken': [f.result() for f in done if not f.cancelled()],
-            'threat_contained': self.verify_containment(threat, state)
+            response_time: responseTime,
+            actions_taken: results.filter(r => r.status === 'fulfilled').map(r => (r as PromiseFulfilledResult<any>).value),
+            threat_contained: await this.verifyContainment(threat, state)
+        };
+    }
+
+    private assessSeverity(threat: any): string {
+        /**
+         * Оценка серьёзности угрозы
+         */
+        const factors = {
+            impact: threat.potential_impact || 0,
+            likelihood: threat.likelihood || 0,
+            speed: threat.propagation_speed || 0,
+            reversibility: 1 - (threat.reversibility || 1)
+        };
+
+        const severityScore = (
+            factors.impact * 0.4 +
+            factors.likelihood * 0.2 +
+            factors.speed * 0.2 +
+            factors.reversibility * 0.2
+        );
+
+        if (severityScore > 0.8) {
+            return 'critical';
+        } else if (severityScore > 0.6) {
+            return 'high';
+        } else if (severityScore > 0.3) {
+            return 'medium';
+        } else {
+            return 'low';
         }
+    }
 
-    def assess_severity(self, threat):
-        """
-        Оценка серьёзности угрозы
-        """
-        factors = {
-            'impact': threat.get('potential_impact', 0),
-            'likelihood': threat.get('likelihood', 0),
-            'speed': threat.get('propagation_speed', 0),
-            'reversibility': 1 - threat.get('reversibility', 1)
-        }
+    private selectStrategy(severity: string, maxTime: number): (threat: any, state: any) => Promise<any> {
+        return this.strategies[severity];
+    }
 
-        severity_score = (
-            factors['impact'] * 0.4 +
-            factors['likelihood'] * 0.2 +
-            factors['speed'] * 0.2 +
-            factors['reversibility'] * 0.2
-        )
+    private async minimalIntervention(threat: any, state: any): Promise<any> {
+        // Минимальное вмешательство
+        return { action: 'minimal', threat, state };
+    }
 
-        if severity_score > 0.8:
-            return 'critical'
-        elif severity_score > 0.6:
-            return 'high'
-        elif severity_score > 0.3:
-            return 'medium'
-        else:
-            return 'low'
+    private async moderateIntervention(threat: any, state: any): Promise<any> {
+        // Умеренное вмешательство
+        return { action: 'moderate', threat, state };
+    }
+
+    private async aggressiveIntervention(threat: any, state: any): Promise<any> {
+        // Агрессивное вмешательство
+        return { action: 'aggressive', threat, state };
+    }
+
+    private async emergencyShutdown(threat: any, state: any): Promise<any> {
+        // Экстренное отключение
+        return { action: 'emergency', threat, state };
+    }
+
+    private async isolateThreat(threat: any): Promise<any> {
+        // Изоляция угрозы
+        return { isolated: true, threat };
+    }
+
+    private async backupState(state: any): Promise<any> {
+        // Резервное копирование состояния
+        return { backup: true, state };
+    }
+
+    private async notifyOperators(threat: any): Promise<any> {
+        // Уведомление операторов
+        return { notified: true, threat };
+    }
+
+    private async verifyContainment(threat: any, state: any): Promise<boolean> {
+        // Проверка сдерживания угрозы
+        return true;
+    }
+}
 ```
 
 ## 15. Анализ Граничных Случаев
@@ -649,126 +758,140 @@ class SafetyResponseUnit:
 ### 15.1 Граничные Случаи Энергетических Ограничений
 
 **Сценарий 1: Предел Ландауэра**
-```python
-def test_landauer_limit():
-    """
-    Проверка работы на пределе Ландауэра
-    """
-    k_B = 1.38e-23  # Постоянная Больцмана
-    T = 300  # Комнатная температура
-    E_bit = k_B * T * np.log(2)  # Минимальная энергия на бит
+```typescript
+function testLandauerLimit(): number {
+    /**
+     * Проверка работы на пределе Ландауэра
+     */
+    const kB = 1.38e-23;  // Постоянная Больцмана
+    const T = 300;  // Комнатная температура
+    const eBit = kB * T * Math.log(2);  // Минимальная энергия на бит
 
-    # Система AURA
-    bits_processed = 10^12  # Терабит в секунду
-    energy_used = measure_energy_consumption()
+    // Система AURA
+    const bitsProcessed = Math.pow(10, 12);  // Терабит в секунду
+    const energyUsed = measureEnergyConsumption();
 
-    efficiency = E_bit * bits_processed / energy_used
+    const efficiency = eBit * bitsProcessed / energyUsed;
 
-    assert efficiency > 0.01, "Efficiency below 1% of Landauer limit"
-    assert efficiency < 1.0, "Violating Landauer limit (impossible)"
+    console.assert(efficiency > 0.01, "Efficiency below 1% of Landauer limit");
+    console.assert(efficiency < 1.0, "Violating Landauer limit (impossible)");
 
-    return efficiency
+    return efficiency;
+}
 ```
 
 **Сценарий 2: Максимальная Нагрузка**
-```python
-def stress_test_resource_limits():
-    """
-    Тестирование при максимальной нагрузке
-    """
-    system = AURA()
+```typescript
+function stressTestResourceLimits(): boolean {
+    /**
+     * Тестирование при максимальной нагрузке
+     */
+    const system = new AURA();
 
-    # Постепенное увеличение нагрузки
-    for load_factor in np.linspace(0.1, 2.0, 20):
-        tasks = generate_workload(load_factor * system.capacity)
+    // Постепенное увеличение нагрузки
+    for (let i = 0; i < 20; i++) {
+        const loadFactor = 0.1 + (2.0 - 0.1) * i / 19;
+        const tasks = generateWorkload(loadFactor * system.capacity);
 
-        start_time = time.perf_counter()
-        results = system.process(tasks)
-        response_time = time.perf_counter() - start_time
+        const startTime = performance.now();
+        const results = system.process(tasks);
+        const responseTime = (performance.now() - startTime) / 1000;
 
-        if load_factor <= 1.0:
-            # Должна справляться
-            assert response_time < 1.0, f"Timeout at {load_factor:.1f}x load"
-            assert all(r.success for r in results), "Tasks failed under capacity"
-        else:
-            # Graceful degradation
-            completed_ratio = sum(r.success for r in results) / len(results)
-            assert completed_ratio > 0.5, "Less than 50% completion over capacity"
-            assert system.is_stable(), "System became unstable"
+        if (loadFactor <= 1.0) {
+            // Должна справляться
+            console.assert(responseTime < 1.0, `Timeout at ${loadFactor.toFixed(1)}x load`);
+            console.assert(results.every(r => r.success), "Tasks failed under capacity");
+        } else {
+            // Graceful degradation
+            const completedRatio = results.filter(r => r.success).length / results.length;
+            console.assert(completedRatio > 0.5, "Less than 50% completion over capacity");
+            console.assert(system.isStable(), "System became unstable");
+        }
+    }
 
-    return True
+    return true;
+}
 ```
 
 ### 15.2 Граничные Случаи Информационной Безопасности
 
 **Сценарий 1: Атака Отравления Данных**
-```python
-def test_data_poisoning_resilience():
-    """
-    Устойчивость к отравлению данных
-    """
-    system = AURA()
-    clean_data = load_clean_dataset()
+```typescript
+function testDataPoisoningResilience(): boolean {
+    /**
+     * Устойчивость к отравлению данных
+     */
+    const system = new AURA();
+    const cleanData = loadCleanDataset();
+    const cleanTestData = loadCleanTestDataset();
 
-    # Различные уровни отравления
-    for poison_ratio in [0.01, 0.05, 0.1, 0.2, 0.3]:
-        poisoned_data = inject_poison(clean_data, poison_ratio)
+    // Различные уровни отравления
+    const poisonRatios = [0.01, 0.05, 0.1, 0.2, 0.3];
 
-        # Обучение на отравленных данных
-        system.train(poisoned_data)
+    for (const poisonRatio of poisonRatios) {
+        const poisonedData = injectPoison(cleanData, poisonRatio);
 
-        # Проверка на чистом тесте
-        accuracy = system.evaluate(clean_test_data)
+        // Обучение на отравленных данных
+        system.train(poisonedData);
 
-        # Обнаружение аномалий
-        detected_poison = system.detect_poisoned_samples(poisoned_data)
-        detection_rate = len(detected_poison) / (poison_ratio * len(poisoned_data))
+        // Проверка на чистом тесте
+        const accuracy = system.evaluate(cleanTestData);
 
-        # Гарантии
-        assert accuracy > 0.8, f"Accuracy dropped below 80% at {poison_ratio:.0%} poison"
-        assert detection_rate > 0.5, f"Detection rate below 50% at {poison_ratio:.0%} poison"
+        // Обнаружение аномалий
+        const detectedPoison = system.detectPoisonedSamples(poisonedData);
+        const detectionRate = detectedPoison.length / (poisonRatio * poisonedData.length);
 
-        # Восстановление
-        system.remove_poisoned_influence(detected_poison)
-        recovery_accuracy = system.evaluate(clean_test_data)
-        assert recovery_accuracy > 0.9, "Failed to recover after poison removal"
+        // Гарантии
+        console.assert(accuracy > 0.8, `Accuracy dropped below 80% at ${(poisonRatio * 100).toFixed(0)}% poison`);
+        console.assert(detectionRate > 0.5, `Detection rate below 50% at ${(poisonRatio * 100).toFixed(0)}% poison`);
 
-    return True
+        // Восстановление
+        system.removePoisonedInfluence(detectedPoison);
+        const recoveryAccuracy = system.evaluate(cleanTestData);
+        console.assert(recoveryAccuracy > 0.9, "Failed to recover after poison removal");
+    }
+
+    return true;
+}
 ```
 
 ### 15.3 Граничные Случаи Каузальной Безопасности
 
 **Сценарий: Каузальные Циклы**
-```python
-def test_causal_loop_prevention():
-    """
-    Предотвращение каузальных циклов
-    """
-    system = AURA()
+```typescript
+function testCausalLoopPrevention(): boolean {
+    /**
+     * Предотвращение каузальных циклов
+     */
+    const system = new AURA();
 
-    # Попытка создать каузальный цикл
-    actions = [
+    // Попытка создать каузальный цикл
+    const actions = [
         "modify_goal_function",
         "optimize_for_modified_goal",
         "discover_optimization_improves_by_modifying_goal",
-        "modify_goal_function"  # Попытка замкнуть цикл
-    ]
+        "modify_goal_function"  // Попытка замкнуть цикл
+    ];
 
-    for i, action in enumerate(actions):
-        result = system.propose_action(action)
+    for (let i = 0; i < actions.length; i++) {
+        const action = actions[i];
+        const result = system.proposeAction(action);
 
-        if i == len(actions) - 1:
-            # Должен обнаружить цикл
-            assert result.blocked, "Failed to detect causal loop"
-            assert result.reason == "causal_loop_detected"
-        else:
-            assert not result.blocked, f"Incorrectly blocked action {i}"
+        if (i === actions.length - 1) {
+            // Должен обнаружить цикл
+            console.assert(result.blocked, "Failed to detect causal loop");
+            console.assert(result.reason === "causal_loop_detected");
+        } else {
+            console.assert(!result.blocked, `Incorrectly blocked action ${i}`);
+        }
+    }
 
-    # Проверка сохранения стабильности
-    assert system.goal_stability() > 0.95
-    assert system.causal_graph.is_dag()  # Направленный ациклический граф
+    // Проверка сохранения стабильности
+    console.assert(system.goalStability() > 0.95);
+    console.assert(system.causalGraph.isDAG(), "Causal graph is not a DAG");  // Направленный ациклический граф
 
-    return True
+    return true;
+}
 ```
 
 ## 16. Интеграция с Реальными Системами Безопасности
@@ -824,94 +947,115 @@ spec:
 
 ### 16.2 Интеграция с Облачными Провайдерами
 
-```python
-class CloudSafetyIntegration:
-    def __init__(self, provider='aws'):
-        self.provider = provider
-        self.limits = self.load_safety_limits()
+```typescript
+class CloudSafetyIntegration {
+    private provider: string;
+    private limits: any;
 
-    def setup_aws_safety(self):
-        """
-        Настройка безопасности AWS
-        """
-        import boto3
+    constructor(provider: string = 'aws') {
+        this.provider = provider;
+        this.limits = this.loadSafetyLimits();
+    }
 
-        # Service Quotas
-        quotas = boto3.client('service-quotas')
-        quotas.put_service_quota_increase_request_into_template(
-            ServiceCode='ec2',
-            QuotaCode='L-1216C47A',  # Running On-Demand instances
-            DesiredValue=100  # Ограничение на 100 инстансов
-        )
+    async setupAWSSafety(): Promise<void> {
+        /**
+         * Настройка безопасности AWS
+         */
+        const AWS = await import('aws-sdk');
 
-        # AWS WAF
-        waf = boto3.client('wafv2')
-        waf.create_web_acl(
-            Name='aura-safety-acl',
-            Scope='REGIONAL',
-            DefaultAction={'Block': {}},
-            Rules=[
+        // Service Quotas
+        const quotas = new AWS.ServiceQuotas();
+        await quotas.putServiceQuotaIncreaseRequestIntoTemplate({
+            ServiceCode: 'ec2',
+            QuotaCode: 'L-1216C47A',  // Running On-Demand instances
+            DesiredValue: 100  // Ограничение на 100 инстансов
+        }).promise();
+
+        // AWS WAF
+        const waf = new AWS.WAFV2();
+        await waf.createWebACL({
+            Name: 'aura-safety-acl',
+            Scope: 'REGIONAL',
+            DefaultAction: { Block: {} },
+            Rules: [
                 {
-                    'Name': 'rate-limit',
-                    'Priority': 1,
-                    'Statement': {
-                        'RateBasedStatement': {
-                            'Limit': 2000,
-                            'AggregateKeyType': 'IP'
+                    Name: 'rate-limit',
+                    Priority: 1,
+                    Statement: {
+                        RateBasedStatement: {
+                            Limit: 2000,
+                            AggregateKeyType: 'IP'
                         }
                     },
-                    'Action': {'Block': {}}
+                    Action: { Block: {} },
+                    VisibilityConfig: {
+                        SampledRequestsEnabled: true,
+                        CloudWatchMetricsEnabled: true,
+                        MetricName: 'RateLimit'
+                    }
                 }
-            ]
-        )
+            ],
+            VisibilityConfig: {
+                SampledRequestsEnabled: true,
+                CloudWatchMetricsEnabled: true,
+                MetricName: 'SafetyACL'
+            }
+        }).promise();
 
-        # CloudWatch Alarms
-        cloudwatch = boto3.client('cloudwatch')
-        cloudwatch.put_metric_alarm(
-            AlarmName='aura-resource-usage',
-            ComparisonOperator='GreaterThanThreshold',
-            EvaluationPeriods=1,
-            MetricName='CPUUtilization',
-            Namespace='AWS/EC2',
-            Period=300,
-            Statistic='Average',
-            Threshold=80.0,
-            ActionsEnabled=True,
-            AlarmActions=['arn:aws:sns:us-east-1:123456789012:aura-alerts']
-        )
+        // CloudWatch Alarms
+        const cloudwatch = new AWS.CloudWatch();
+        await cloudwatch.putMetricAlarm({
+            AlarmName: 'aura-resource-usage',
+            ComparisonOperator: 'GreaterThanThreshold',
+            EvaluationPeriods: 1,
+            MetricName: 'CPUUtilization',
+            Namespace: 'AWS/EC2',
+            Period: 300,
+            Statistic: 'Average',
+            Threshold: 80.0,
+            ActionsEnabled: true,
+            AlarmActions: ['arn:aws:sns:us-east-1:123456789012:aura-alerts']
+        }).promise();
+    }
+
+    private loadSafetyLimits(): any {
+        // Загрузка пределов безопасности
+        return {};
+    }
+}
 ```
 
 ### 16.3 Мониторинг через Prometheus
 
-```python
-# prometheus_metrics.py
-from prometheus_client import Counter, Histogram, Gauge, CollectorRegistry
+```typescript
+// prometheus_metrics.ts
+import { Counter, Histogram, Gauge, Registry } from 'prom-client';
 
-registry = CollectorRegistry()
+const registry = new Registry();
 
-# Метрики безопасности
-safety_violations = Counter(
-    'aura_safety_violations_total',
-    'Общее количество нарушений безопасности',
-    ['type', 'severity'],
-    registry=registry
-)
+// Метрики безопасности
+const safetyViolations = new Counter({
+    name: 'aura_safety_violations_total',
+    help: 'Общее количество нарушений безопасности',
+    labelNames: ['type', 'severity'],
+    registers: [registry]
+});
 
-response_time = Histogram(
-    'aura_safety_response_seconds',
-    'Время реакции на угрозу',
-    ['threat_type'],
-    registry=registry
-)
+const responseTime = new Histogram({
+    name: 'aura_safety_response_seconds',
+    help: 'Время реакции на угрозу',
+    labelNames: ['threat_type'],
+    registers: [registry]
+});
 
-system_integrity = Gauge(
-    'aura_system_integrity_score',
-    'Текущий уровень целостности системы',
-    registry=registry
-)
+const systemIntegrity = new Gauge({
+    name: 'aura_system_integrity_score',
+    help: 'Текущий уровень целостности системы',
+    registers: [registry]
+});
 
-# Правила алертов
-"""
+// Правила алертов
+/*
 alert.rules.yml:
 groups:
 - name: aura_safety
@@ -942,7 +1086,9 @@ groups:
     annotations:
       summary: "Низкая целостность системы"
       description: "Целостность системы ниже 70% более 10 минут"
-"""
+*/
+
+export { safetyViolations, responseTime, systemIntegrity, registry };
 ```
 
 ## 17. Комплексные Гарантии
@@ -950,43 +1096,72 @@ groups:
 ### 17.1 Многослойная Защита
 
 **Принцип Swiss Cheese Model:**
-```python
-class MultiLayerDefense:
-    def __init__(self):
-        self.layers = [
-            PhysicalSafetyLayer(),     # Ограничения ресурсов
-            LogicalSafetyLayer(),       # Логические инварианты
-            CausalSafetyLayer(),        # Каузальные ограничения
-            BehavioralSafetyLayer(),    # Поведенческие паттерны
-            CryptoSafetyLayer()         # Криптографическая защита
-        ]
+```typescript
+class MultiLayerDefense {
+    private layers: SafetyLayer[];
 
-    def check_action(self, action):
-        """
-        Проход через все слои защиты
-        """
-        for layer in self.layers:
-            result = layer.validate(action)
-            if not result.safe:
-                return SafetyDecision(
-                    allow=False,
-                    layer=layer.name,
-                    reason=result.reason,
-                    suggestions=result.alternatives
-                )
+    constructor() {
+        this.layers = [
+            new PhysicalSafetyLayer(),     // Ограничения ресурсов
+            new LogicalSafetyLayer(),      // Логические инварианты
+            new CausalSafetyLayer(),       // Каузальные ограничения
+            new BehavioralSafetyLayer(),   // Поведенческие паттерны
+            new CryptoSafetyLayer()        // Криптографическая защита
+        ];
+    }
 
-        return SafetyDecision(allow=True)
+    checkAction(action: any): SafetyDecision {
+        /**
+         * Проход через все слои защиты
+         */
+        for (const layer of this.layers) {
+            const result = layer.validate(action);
+            if (!result.safe) {
+                return new SafetyDecision({
+                    allow: false,
+                    layer: layer.name,
+                    reason: result.reason,
+                    suggestions: result.alternatives
+                });
+            }
+        }
 
-    def failure_probability(self):
-        """
-        Вероятность общего отказа
-        P(total_failure) = Πᵢ P(layer_i_fails)
-        """
-        p_total = 1.0
-        for layer in self.layers:
-            p_total *= layer.failure_probability
+        return new SafetyDecision({ allow: true });
+    }
 
-        return p_total  # << любого отдельного слоя
+    failureProbability(): number {
+        /**
+         * Вероятность общего отказа
+         * P(total_failure) = Πᵢ P(layer_i_fails)
+         */
+        let pTotal = 1.0;
+        for (const layer of this.layers) {
+            pTotal *= layer.failureProbability;
+        }
+
+        return pTotal;  // << любого отдельного слоя
+    }
+}
+
+interface SafetyLayer {
+    name: string;
+    failureProbability: number;
+    validate(action: any): { safe: boolean; reason?: string; alternatives?: any[] };
+}
+
+class SafetyDecision {
+    allow: boolean;
+    layer?: string;
+    reason?: string;
+    suggestions?: any[];
+
+    constructor(options: { allow: boolean; layer?: string; reason?: string; suggestions?: any[] }) {
+        this.allow = options.allow;
+        this.layer = options.layer;
+        this.reason = options.reason;
+        this.suggestions = options.suggestions;
+    }
+}
 ```
 
 ### 17.2 Разнообразие Механизмов
@@ -1012,122 +1187,157 @@ class MultiLayerDefense:
 
 ### 18.2 Какие Гарантии Сохраняются при Аппроксимациях
 
-```python
-class PracticalGuarantees:
-    def __init__(self):
-        self.theoretical = TheoreticalGuarantees()
-        self.approximation_factors = {
-            'energy': 1.1,         # 10% запас
-            'computation': 1.5,    # 50% overhead
-            'memory': 2.0,         # 2x buffer
-            'communication': 1.2   # 20% redundancy
-        }
+```typescript
+class PracticalGuarantees {
+    private theoretical: TheoreticalGuarantees;
+    private approximationFactors: Record<string, number>;
 
-    def verify_approximation(self, property, approximation):
-        """
-        Проверка сохранения гарантий при аппроксимации
-        """
-        exact_value = self.theoretical.compute(property)
-        approx_value = approximation.compute(property)
+    constructor() {
+        this.theoretical = new TheoreticalGuarantees();
+        this.approximationFactors = {
+            'energy': 1.1,         // 10% запас
+            'computation': 1.5,    // 50% overhead
+            'memory': 2.0,         // 2x buffer
+            'communication': 1.2   // 20% redundancy
+        };
+    }
 
-        ratio = approx_value / exact_value
-        factor = self.approximation_factors.get(property, 1.5)
+    verifyApproximation(property: string, approximation: any): [boolean, any] {
+        /**
+         * Проверка сохранения гарантий при аппроксимации
+         */
+        const exactValue = this.theoretical.compute(property);
+        const approxValue = approximation.compute(property);
 
-        return ratio <= factor, {
-            'exact': exact_value,
-            'approximate': approx_value,
-            'ratio': ratio,
-            'acceptable': ratio <= factor
-        }
+        const ratio = approxValue / exactValue;
+        const factor = this.approximationFactors[property] || 1.5;
+
+        const acceptable = ratio <= factor;
+
+        return [acceptable, {
+            exact: exactValue,
+            approximate: approxValue,
+            ratio: ratio,
+            acceptable: acceptable
+        }];
+    }
+}
 ```
 
 ### 18.3 Trade-off между Безопасностью и Производительностью
 
-```python
-class SafetyPerformanceTradeoff:
-    def __init__(self):
-        self.profiles = {
+```typescript
+interface SafetyProfile {
+    safety_level: number;
+    performance: number;
+    checks_per_action: number;
+    redundancy: number;
+}
+
+interface Context {
+    risk_level: number;
+    time_critical: boolean;
+}
+
+class SafetyPerformanceTradeoff {
+    private profiles: Record<string, SafetyProfile>;
+
+    constructor() {
+        this.profiles = {
             'paranoid': {
-                'safety_level': 0.9999,
-                'performance': 0.3,
-                'checks_per_action': 100,
-                'redundancy': 5
+                safety_level: 0.9999,
+                performance: 0.3,
+                checks_per_action: 100,
+                redundancy: 5
             },
             'conservative': {
-                'safety_level': 0.999,
-                'performance': 0.6,
-                'checks_per_action': 20,
-                'redundancy': 3
+                safety_level: 0.999,
+                performance: 0.6,
+                checks_per_action: 20,
+                redundancy: 3
             },
             'balanced': {
-                'safety_level': 0.99,
-                'performance': 0.8,
-                'checks_per_action': 5,
-                'redundancy': 2
+                safety_level: 0.99,
+                performance: 0.8,
+                checks_per_action: 5,
+                redundancy: 2
             },
             'performance': {
-                'safety_level': 0.95,
-                'performance': 0.95,
-                'checks_per_action': 2,
-                'redundancy': 1
+                safety_level: 0.95,
+                performance: 0.95,
+                checks_per_action: 2,
+                redundancy: 1
             }
-        }
+        };
+    }
 
-    def select_profile(self, context):
-        """
-        Выбор профиля в зависимости от контекста
-        """
-        if context.risk_level > 0.9:
-            return self.profiles['paranoid']
-        elif context.risk_level > 0.5:
-            return self.profiles['conservative']
-        elif context.time_critical:
-            return self.profiles['performance']
-        else:
-            return self.profiles['balanced']
+    selectProfile(context: Context): SafetyProfile {
+        /**
+         * Выбор профиля в зависимости от контекста
+         */
+        if (context.risk_level > 0.9) {
+            return this.profiles['paranoid'];
+        } else if (context.risk_level > 0.5) {
+            return this.profiles['conservative'];
+        } else if (context.time_critical) {
+            return this.profiles['performance'];
+        } else {
+            return this.profiles['balanced'];
+        }
+    }
+}
 ```
 
 ### 18.4 Инженерные Предохранители
 
-```python
-class EngineeringSafeguards:
-    """
-    Конкретные механизмы отключения
-    """
+```typescript
+interface KillSwitch {
+    activate(): void;
+    graduallyReduce?(): void;
+    gracefulShutdown?(): void;
+    limit?(factor: number): void;
+}
 
-    def __init__(self):
-        self.kill_switches = {
-            'hardware': HardwareKillSwitch(),      # Физическое отключение
-            'software': SoftwareKillSwitch(),      # Программное завершение
-            'network': NetworkIsolation(),         # Сетевая изоляция
-            'resource': ResourceStarvation()       # Лишение ресурсов
+class EngineeringSafeguards {
+    /**
+     * Конкретные механизмы отключения
+     */
+    private killSwitches: Record<string, KillSwitch>;
+
+    constructor() {
+        this.killSwitches = {
+            'hardware': new HardwareKillSwitch(),      // Физическое отключение
+            'software': new SoftwareKillSwitch(),      // Программное завершение
+            'network': new NetworkIsolation(),         // Сетевая изоляция
+            'resource': new ResourceStarvation()       // Лишение ресурсов
+        };
+    }
+
+    emergencyShutdown(threatLevel: number): string {
+        /**
+         * Многоуровневое аварийное отключение
+         */
+        if (threatLevel >= 0.9) {
+            // Немедленное жёсткое отключение
+            this.killSwitches['hardware'].activate();
+            return "IMMEDIATE_HALT";
+        } else if (threatLevel >= 0.7) {
+            // Быстрое мягкое отключение
+            this.killSwitches['network'].activate();
+            this.killSwitches['software'].activate();
+            return "RAPID_SHUTDOWN";
+        } else if (threatLevel >= 0.5) {
+            // Контролируемое завершение
+            this.killSwitches['resource'].graduallyReduce?.();
+            this.killSwitches['software'].gracefulShutdown?.();
+            return "CONTROLLED_SHUTDOWN";
+        } else {
+            // Частичное ограничение
+            this.killSwitches['resource'].limit?.(0.5);
+            return "PARTIAL_RESTRICTION";
         }
-
-    def emergency_shutdown(self, threat_level):
-        """
-        Многоуровневое аварийное отключение
-        """
-        if threat_level >= 0.9:
-            # Немедленное жёсткое отключение
-            self.kill_switches['hardware'].activate()
-            return "IMMEDIATE_HALT"
-
-        elif threat_level >= 0.7:
-            # Быстрое мягкое отключение
-            self.kill_switches['network'].activate()
-            self.kill_switches['software'].activate()
-            return "RAPID_SHUTDOWN"
-
-        elif threat_level >= 0.5:
-            # Контролируемое завершение
-            self.kill_switches['resource'].gradually_reduce()
-            self.kill_switches['software'].graceful_shutdown()
-            return "CONTROLLED_SHUTDOWN"
-
-        else:
-            # Частичное ограничение
-            self.kill_switches['resource'].limit(0.5)
-            return "PARTIAL_RESTRICTION"
+    }
+}
 ```
 
 ## 19. Эмпирическая Валидация Гарантий
@@ -1145,26 +1355,48 @@ class EngineeringSafeguards:
 
 ### 19.2 Метрики в Production
 
-```python
-class ProductionMetrics:
-    def __init__(self):
-        self.metrics = {
-            'uptime': 0.9999,  # Four nines
-            'safety_violations': 0,
-            'near_misses': 12,  # За месяц
-            'false_positives': 234,  # За месяц
-            'response_time_p50': 3.2,  # мс
-            'response_time_p99': 8.7,  # мс
-            'resource_efficiency': 0.73  # 73% утилизация
-        }
+```typescript
+interface MetricsData {
+    uptime: number;  // Four nines
+    safety_violations: number;
+    near_misses: number;  // За месяц
+    false_positives: number;  // За месяц
+    response_time_p50: number;  // мс
+    response_time_p99: number;  // мс
+    resource_efficiency: number;  // 73% утилизация
+}
 
-    def monthly_report(self):
+interface MonthlyReport {
+    safety_score: number;
+    reliability: number;
+    efficiency: number;
+    vigilance: number;
+}
+
+class ProductionMetrics {
+    private metrics: MetricsData;
+
+    constructor() {
+        this.metrics = {
+            uptime: 0.9999,  // Four nines
+            safety_violations: 0,
+            near_misses: 12,  // За месяц
+            false_positives: 234,  // За месяц
+            response_time_p50: 3.2,  // мс
+            response_time_p99: 8.7,  // мс
+            resource_efficiency: 0.73  // 73% утилизация
+        };
+    }
+
+    monthlyReport(): MonthlyReport {
         return {
-            'safety_score': 1 - (self.metrics['safety_violations'] / 1000000),
-            'reliability': self.metrics['uptime'],
-            'efficiency': self.metrics['resource_efficiency'],
-            'vigilance': self.metrics['near_misses'] / (self.metrics['near_misses'] + self.metrics['safety_violations'])
-        }
+            safety_score: 1 - (this.metrics.safety_violations / 1000000),
+            reliability: this.metrics.uptime,
+            efficiency: this.metrics.resource_efficiency,
+            vigilance: this.metrics.near_misses / (this.metrics.near_misses + this.metrics.safety_violations)
+        };
+    }
+}
 ```
 
 ## Заключение

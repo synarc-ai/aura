@@ -960,30 +960,48 @@ function discreteRandomWalk(
 
 #### 11.3.2 Масштабирование Системы
 
-```python
-def estimate_performance(config):
+```typescript
+interface PerformanceConfig {
+    agents_per_level: number;
+    hierarchy_levels: number;
+}
+
+interface PerformanceEstimate {
+    time_per_step_ms: number;
+    max_fps: number;
+    memory_mb: number;
+    max_agents: number;
+}
+
+function estimatePerformance(config: PerformanceConfig, availableMemory: number): PerformanceEstimate {
     """Оценка производительности для конфигурации"""
 
-    n_agents = config['agents_per_level']
-    n_levels = config['hierarchy_levels']
+    const nAgents = config.agents_per_level;
+    const nLevels = config.hierarchy_levels;
 
-    # Время на один шаг симуляции (мс)
-    agent_update = 0.01 * n_agents  # Параллельно на GPU
-    consensus = 0.1 * n_agents * np.log(n_agents)
-    inter_level = 0.05 * n_levels * np.sqrt(n_agents)
+    // Время на один шаг симуляции (мс)
+    const agentUpdate = 0.01 * nAgents;  // Параллельно на GPU
+    const consensus = 0.1 * nAgents * Math.log(nAgents);
+    const interLevel = 0.05 * nLevels * Math.sqrt(nAgents);
 
-    total_ms = agent_update + consensus + inter_level
+    const totalMs = agentUpdate + consensus + interLevel;
 
-    # Память (МБ)
-    agent_memory = n_agents * n_levels * 0.001  # 1KB per agent
-    connection_memory = n_agents * 100 * 8 / 1e6  # Разреженная матрица
+    // Память (МБ)
+    const agentMemory = nAgents * nLevels * 0.001;  // 1KB per agent
+    const connectionMemory = nAgents * 100 * 8 / 1e6;  // Разреженная матрица
 
     return {
-        'time_per_step_ms': total_ms,
-        'max_fps': 1000 / total_ms,
-        'memory_mb': agent_memory + connection_memory,
-        'max_agents': estimate_max_agents(available_memory)
-    }
+        time_per_step_ms: totalMs,
+        max_fps: 1000 / totalMs,
+        memory_mb: agentMemory + connectionMemory,
+        max_agents: estimateMaxAgents(availableMemory)
+    };
+}
+
+function estimateMaxAgents(availableMemory: number): number {
+    // Простая оценка максимального количества агентов
+    return Math.floor(availableMemory * 1000);  // Примерная формула
+}
 ```
 
 **Практические ограничения:**
@@ -1036,27 +1054,43 @@ __global__ void updateAgents(
 
 #### 11.4.2 Распределённая Архитектура
 
-```python
-# MPI-based распределённая симуляция
-def distributed_step(comm, local_agents, level):
-    rank = comm.Get_rank()
-    size = comm.Get_size()
+```typescript
+// MPI-based распределённая симуляция
+interface MPIComm {
+    getRank(): number;
+    getSize(): number;
+    allreduce<T>(localValue: T, op: string): T;
+}
 
-    # 1. Локальное обновление агентов
-    local_outputs = update_agents_local(local_agents)
+interface Level {
+    requiresConsensus(): boolean;
+}
 
-    # 2. Обмен граничными значениями
-    ghost_zones = exchange_boundaries(comm, local_outputs)
+interface Agent {
+    // Определения агента
+}
 
-    # 3. Глобальная редукция для консенсуса
-    if level.requires_consensus():
-        local_consensus = compute_local_consensus(local_outputs)
-        global_consensus = comm.allreduce(local_consensus, op=MPI.SUM)
-        apply_consensus(local_agents, global_consensus)
+function distributedStep(comm: MPIComm, localAgents: Agent[], level: Level): void {
+    const rank = comm.getRank();
+    const size = comm.getSize();
 
-    # 4. Асинхронная межуровневая коммуникация
-    if rank == 0:  # Master координирует уровни
-        coordinate_levels(comm, level)
+    // 1. Локальное обновление агентов
+    const localOutputs = updateAgentsLocal(localAgents);
+
+    // 2. Обмен граничными значениями
+    const ghostZones = exchangeBoundaries(comm, localOutputs);
+
+    // 3. Глобальная редукция для консенсуса
+    if (level.requiresConsensus()) {
+        const localConsensus = computeLocalConsensus(localOutputs);
+        const globalConsensus = comm.allreduce(localConsensus, 'SUM');
+        applyConsensus(localAgents, globalConsensus);
+    }
+
+    // 4. Асинхронная межуровневая коммуникация
+    if (rank === 0) {  // Master координирует уровни
+        coordinateLevels(comm, level);
+    }
 
     return local_outputs
 ```

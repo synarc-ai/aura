@@ -24,14 +24,24 @@
 ### 2.1 Потеря Иерархической Когерентности
 
 #### Симптомы
-```python
-def detect_coherence_loss():
-    metrics = {
-        'inter_level_sync': 0.2,  # Норма >0.8
-        'consensus_rate': 0.1,    # Норма >0.7
-        'phi_integrated': 0.05     # Норма >0.3
-    }
-    return any(m < threshold for m in metrics)
+```typescript
+function detectCoherenceLoss(): boolean {
+    const metrics = {
+        inter_level_sync: 0.2,  // Норма >0.8
+        consensus_rate: 0.1,    // Норма >0.7
+        phi_integrated: 0.05     // Норма >0.3
+    };
+
+    const thresholds = {
+        inter_level_sync: 0.8,
+        consensus_rate: 0.7,
+        phi_integrated: 0.3
+    };
+
+    return Object.entries(metrics).some(
+        ([key, value]) => value < thresholds[key as keyof typeof thresholds]
+    );
+}
 ```
 
 #### Признаки
@@ -91,18 +101,20 @@ class HierarchyRecovery {
 | Фрактальная размерность | 2-3 | >4 | Box-counting dimension |
 
 #### Автоматическая Стабилизация
-```python
-def chaos_damping():
-    # Введение диссипации
-    for agent in agents:
-        agent.energy *= 0.99  # Демпфирование 1%
+```typescript
+function chaosDamping(): void {
+    // Введение диссипации
+    for (const agent of agents) {
+        agent.energy *= 0.99;  // Демпфирование 1%
+    }
 
-    # Увеличение связности для синхронизации
-    increase_coupling_strength(factor=1.5)
+    // Увеличение связности для синхронизации
+    increaseCouplingStrength({ factor: 1.5 });
 
-    # Введение глобального ингибирования
-    global_inhibition = calculate_mean_activity() * 0.1
-    broadcast_inhibition(global_inhibition)
+    // Введение глобального ингибирования
+    const globalInhibition = calculateMeanActivity() * 0.1;
+    broadcastInhibition(globalInhibition);
+}
 ```
 
 ### 2.3 Застревание в Локальных Оптимумах
@@ -142,26 +154,59 @@ interface EscapeStrategy {
 - Экспоненциальный рост времени отклика
 
 #### Предотвращение
-```python
-class ComplexityLimiter:
-    MAX_AGENTS = 1e9
-    MAX_CONNECTIONS_PER_AGENT = 1000
-    MAX_HIERARCHY_DEPTH = 10
-    MAX_COMPUTATION_TIME_MS = 5000
+```typescript
+class ComplexityLimiter {
+    private static readonly MAX_AGENTS = 1e9;
+    private static readonly MAX_CONNECTIONS_PER_AGENT = 1000;
+    private static readonly MAX_HIERARCHY_DEPTH = 10;
+    private static readonly MAX_COMPUTATION_TIME_MS = 5000;
 
-    def enforce_limits(self):
-        # Динамическое прореживание
-        if self.agent_count > self.MAX_AGENTS * 0.8:
-            self.prune_least_active(percent=10)
+    private agents: Agent[];
+    private agentCount: number;
 
-        # Ограничение связности
-        for agent in self.agents:
-            if len(agent.connections) > self.MAX_CONNECTIONS_PER_AGENT:
-                agent.drop_weakest_connections()
+    constructor(agents: Agent[]) {
+        this.agents = agents;
+        this.agentCount = agents.length;
+    }
 
-        # Timeout на вычисления
-        with timeout(self.MAX_COMPUTATION_TIME_MS):
-            return self.compute()
+    async enforceLimits(): Promise<any> {
+        // Динамическое прореживание
+        if (this.agentCount > ComplexityLimiter.MAX_AGENTS * 0.8) {
+            this.pruneLeastActive(10);  // percent
+        }
+
+        // Ограничение связности
+        for (const agent of this.agents) {
+            if (agent.connections.length > ComplexityLimiter.MAX_CONNECTIONS_PER_AGENT) {
+                agent.dropWeakestConnections();
+            }
+        }
+
+        // Timeout на вычисления
+        return await this.withTimeout(
+            ComplexityLimiter.MAX_COMPUTATION_TIME_MS,
+            () => this.compute()
+        );
+    }
+
+    private pruneLeastActive(percent: number): void {
+        // Реализация прореживания
+    }
+
+    private async withTimeout<T>(timeoutMs: number, operation: () => Promise<T>): Promise<T> {
+        return Promise.race([
+            operation(),
+            new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('Computation timeout')), timeoutMs)
+            )
+        ]);
+    }
+
+    private async compute(): Promise<any> {
+        // Реализация вычислений
+        return {};
+    }
+}
 ```
 
 ### 2.5 Декогеренция Квантовых Компонентов
@@ -176,17 +221,24 @@ class ComplexityLimiter:
 2. **Динамическая декаплинг** (DD sequences)
 3. **Fallback на классические алгоритмы**
 
-```python
-def quantum_fallback(task):
-    try:
-        result = quantum_processor.execute(task, shots=1000)
-        if result.fidelity > 0.7:
-            return result
-    except QuantumDecoherenceError:
-        pass
+```typescript
+function quantumFallback(task: QuantumTask): QuantumResult {
+    try {
+        const result = quantumProcessor.execute(task, { shots: 1000 });
+        if (result.fidelity > 0.7) {
+            return result;
+        }
+    } catch (error) {
+        if (error instanceof QuantumDecoherenceError) {
+            // Продолжаем к классической эмуляции
+        } else {
+            throw error;
+        }
+    }
 
-    # Классическая эмуляция
-    return classical_simulator.emulate_quantum(task)
+    // Классическая эмуляция
+    return classicalSimulator.emulateQuantum(task);
+}
 ```
 
 ## 3. Каскадные Отказы
@@ -242,26 +294,59 @@ class CascadeBreaker {
 
 ### 4.1 Ключевые Индикаторы
 
-```python
-class HealthMonitor:
-    def __init__(self):
-        self.indicators = {
-            'phi': {'threshold': 0.2, 'window': 60},
-            'consensus_rate': {'threshold': 0.5, 'window': 30},
-            'latency_p99': {'threshold': 1000, 'window': 10},
-            'error_rate': {'threshold': 0.01, 'window': 60},
-            'memory_usage': {'threshold': 0.8, 'window': 5},
-            'agent_mortality': {'threshold': 0.1, 'window': 300}
+```typescript
+interface IndicatorConfig {
+    threshold: number;
+    window: number;
+}
+
+interface Alert {
+    name: string;
+    value: number;
+    severity: number;
+}
+
+class HealthStatus {
+    constructor(public alerts: Alert[]) {}
+}
+
+class HealthMonitor {
+    private indicators: Record<string, IndicatorConfig> = {
+        'phi': { threshold: 0.2, window: 60 },
+        'consensus_rate': { threshold: 0.5, window: 30 },
+        'latency_p99': { threshold: 1000, window: 10 },
+        'error_rate': { threshold: 0.01, window: 60 },
+        'memory_usage': { threshold: 0.8, window: 5 },
+        'agent_mortality': { threshold: 0.1, window: 300 }
+    };
+
+    checkHealth(): HealthStatus {
+        const alerts: Alert[] = [];
+
+        for (const [name, config] of Object.entries(this.indicators)) {
+            const value = this.measure(name, config.window);
+            if (value > config.threshold) {
+                alerts.push({
+                    name: name,
+                    value: value,
+                    severity: this.calculateSeverity(name, value)
+                });
+            }
         }
 
-    def check_health(self) -> HealthStatus:
-        alerts = []
-        for name, config in self.indicators.items():
-            value = self.measure(name, config['window'])
-            if value > config['threshold']:
-                alerts.append(Alert(name, value, severity=self.calculate_severity(name, value)))
+        return new HealthStatus(alerts);
+    }
 
-        return HealthStatus(alerts)
+    private measure(name: string, window: number): number {
+        // Реализация измерения метрики
+        return 0;
+    }
+
+    private calculateSeverity(name: string, value: number): number {
+        // Расчет серьезности
+        return 1;
+    }
+}
 ```
 
 ### 4.2 Dashboard Реального Времени
@@ -303,34 +388,107 @@ alerts:
 
 ### 5.1 Автоматическое Восстановление
 
-```python
-class AutoRecovery:
-    strategies = [
-        ('restart_failed_agents', 0.9),     # Простейшее
-        ('rollback_to_checkpoint', 0.7),     # Откат
-        ('reduce_load', 0.5),                # Деградация
-        ('isolate_and_rebuild', 0.3),        # Изоляция
-        ('full_system_restart', 0.1)         # Крайняя мера
-    ]
+```typescript
+type RecoveryStrategy = {
+    name: string;
+    successProbability: number;
+    method: (failureType: FailureMode) => Promise<void>;
+};
 
-    def recover(self, failure_type: FailureMode) -> bool:
-        for strategy_name, success_probability in self.strategies:
-            strategy = getattr(self, strategy_name)
+class RecoveryFailedException extends Error {}
 
-            try:
-                strategy(failure_type)
+enum FailureMode {
+    COHERENCE_LOSS = 'coherence_loss',
+    EMERGENT_CHAOS = 'emergent_chaos',
+    LOCAL_OPTIMUM = 'local_optimum',
+    RESOURCE_EXHAUSTION = 'resource_exhaustion'
+}
 
-                # Валидация восстановления
-                if self.validate_recovery():
-                    self.log_recovery_success(strategy_name)
-                    return True
+class AutoRecovery {
+    private strategies: RecoveryStrategy[] = [
+        {
+            name: 'restart_failed_agents',
+            successProbability: 0.9,  // Простейшее
+            method: this.restartFailedAgents.bind(this)
+        },
+        {
+            name: 'rollback_to_checkpoint',
+            successProbability: 0.7,  // Откат
+            method: this.rollbackToCheckpoint.bind(this)
+        },
+        {
+            name: 'reduce_load',
+            successProbability: 0.5,  // Деградация
+            method: this.reduceLoad.bind(this)
+        },
+        {
+            name: 'isolate_and_rebuild',
+            successProbability: 0.3,  // Изоляция
+            method: this.isolateAndRebuild.bind(this)
+        },
+        {
+            name: 'full_system_restart',
+            successProbability: 0.1,  // Крайняя мера
+            method: this.fullSystemRestart.bind(this)
+        }
+    ];
 
-            except RecoveryFailedException:
-                continue
+    async recover(failureType: FailureMode): Promise<boolean> {
+        for (const strategy of this.strategies) {
+            try {
+                await strategy.method(failureType);
 
-        # Все стратегии провалились
-        self.escalate_to_human()
-        return False
+                // Валидация восстановления
+                if (await this.validateRecovery()) {
+                    this.logRecoverySuccess(strategy.name);
+                    return true;
+                }
+            } catch (error) {
+                if (error instanceof RecoveryFailedException) {
+                    continue;
+                }
+                throw error;
+            }
+        }
+
+        // Все стратегии провалились
+        this.escalateToHuman();
+        return false;
+    }
+
+    private async restartFailedAgents(failureType: FailureMode): Promise<void> {
+        // Реализация перезапуска агентов
+    }
+
+    private async rollbackToCheckpoint(failureType: FailureMode): Promise<void> {
+        // Реализация отката
+    }
+
+    private async reduceLoad(failureType: FailureMode): Promise<void> {
+        // Реализация снижения нагрузки
+    }
+
+    private async isolateAndRebuild(failureType: FailureMode): Promise<void> {
+        // Реализация изоляции и перестроения
+    }
+
+    private async fullSystemRestart(failureType: FailureMode): Promise<void> {
+        // Реализация полного перезапуска
+    }
+
+    private async validateRecovery(): Promise<boolean> {
+        // Проверка успешности восстановления
+        return true;
+    }
+
+    private logRecoverySuccess(strategyName: string): void {
+        console.log(`Recovery successful using strategy: ${strategyName}`);
+    }
+
+    private escalateToHuman(): void {
+        console.log('All recovery strategies failed, escalating to human operators');
+    }
+}
 ```
 
 ### 5.2 Ручное Вмешательство
@@ -363,9 +521,16 @@ aura restart --gradual --monitor
 
 ### 6.1 Chaos Engineering
 
-```python
-class ChaosMonkey:
-    scenarios = [
+```typescript
+interface ChaosTestResult {
+    scenario: string;
+    recoveryTime: number;
+    dataLoss: number;
+    passed: boolean;
+}
+
+class ChaosMonkey {
+    private scenarios: string[] = [
         'kill_random_agents',
         'network_partition',
         'clock_skew',
@@ -373,24 +538,43 @@ class ChaosMonkey:
         'cpu_spike',
         'byzantine_agents',
         'data_corruption'
-    ]
+    ];
 
-    def run_chaos_test(self, intensity=0.1):
-        scenario = random.choice(self.scenarios)
+    private SLA = 300; // 5 минут SLA для восстановления
 
-        # Инъекция сбоя
-        self.inject_failure(scenario, intensity)
+    runChaosTest(intensity: number = 0.1): ChaosTestResult {
+        const scenario = this.scenarios[Math.floor(Math.random() * this.scenarios.length)];
 
-        # Мониторинг восстановления
-        recovery_time = self.measure_recovery_time()
-        data_loss = self.measure_data_loss()
+        // Инъекция сбоя
+        this.injectFailure(scenario, intensity);
+
+        // Мониторинг восстановления
+        const recoveryTime = this.measureRecoveryTime();
+        const dataLoss = this.measureDataLoss();
 
         return {
-            'scenario': scenario,
-            'recovery_time': recovery_time,
-            'data_loss': data_loss,
-            'passed': recovery_time < SLA and data_loss == 0
-        }
+            scenario: scenario,
+            recoveryTime: recoveryTime,
+            dataLoss: dataLoss,
+            passed: recoveryTime < this.SLA && dataLoss === 0
+        };
+    }
+
+    private injectFailure(scenario: string, intensity: number): void {
+        // Реализация инъекции сбоя
+        console.log(`Injecting failure: ${scenario} with intensity ${intensity}`);
+    }
+
+    private measureRecoveryTime(): number {
+        // Измерение времени восстановления
+        return 0;
+    }
+
+    private measureDataLoss(): number {
+        // Измерение потерь данных
+        return 0;
+    }
+}
 ```
 
 ### 6.2 Нагрузочное Тестирование
@@ -485,24 +669,47 @@ LIMIT 5;
 
 При невозможности поддержать полную функциональность:
 
-```python
-class GracefulDegradation:
-    priority_levels = {
-        1: ['core_reasoning', 'safety_checks'],      # Никогда не отключать
-        2: ['causal_inference', 'planning'],         # Важные
-        3: ['natural_language', 'vision'],           # Желательные
-        4: ['quantum_acceleration', 'optimization'], # Опциональные
+```typescript
+class GracefulDegradation {
+    private priorityLevels: Record<number, string[]> = {
+        1: ['core_reasoning', 'safety_checks'],      // Никогда не отключать
+        2: ['causal_inference', 'planning'],         // Важные
+        3: ['natural_language', 'vision'],           // Желательные
+        4: ['quantum_acceleration', 'optimization'], // Опциональные
+    };
+
+    degrade(availableResources: number): void {
+        /**
+         * Отключает функции начиная с низкого приоритета
+         */
+        for (let priority = 4; priority >= 1; priority--) {
+            if (this.resourceUsage() <= availableResources) {
+                break;
+            }
+
+            const features = this.priorityLevels[priority];
+            if (features) {
+                for (const feature of features) {
+                    this.disableFeature(feature);
+                    this.notifyUsers(`Feature ${feature} temporarily disabled`);
+                }
+            }
+        }
     }
 
-    def degrade(self, available_resources: float):
-        """Отключает функции начиная с низкого приоритета"""
-        for priority in reversed(range(1, 5)):
-            if self.resource_usage() <= available_resources:
-                break
+    private resourceUsage(): number {
+        // Оценка текущего использования ресурсов
+        return 0.0;
+    }
 
-            for feature in self.priority_levels[priority]:
-                self.disable_feature(feature)
-                self.notify_users(f"Feature {feature} temporarily disabled")
+    private disableFeature(feature: string): void {
+        console.log(`Disabling feature: ${feature}`);
+    }
+
+    private notifyUsers(message: string): void {
+        console.log(`User notification: ${message}`);
+    }
+}
 ```
 
 ## Заключение

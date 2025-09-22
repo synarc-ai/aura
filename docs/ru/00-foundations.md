@@ -290,15 +290,24 @@ AURA учится на примерах успешных систем:
 
 Для каждого архитектурного решения вычисляем:
 
-```python
-def compromise_score(solution):
+```typescript
+interface CompromiseScore {
+    theoretical_power: number;           // 0.0-1.0, насколько близко к идеалу
+    practical_speed: number;             // ops/sec, реальная производительность
+    resource_cost: number;               // $/hour, стоимость вычислений
+    implementation_complexity: number;   // LOC, строки кода
+    debug_difficulty: number;            // 0.0-1.0, сложность отладки
+}
+
+function compromiseScore(solution: any): CompromiseScore {
     return {
-        'theoretical_power': 0.0-1.0,    # Насколько близко к идеалу
-        'practical_speed': ops/sec,       # Реальная производительность
-        'resource_cost': $/hour,          # Стоимость вычислений
-        'implementation_complexity': LOC, # Строки кода
-        'debug_difficulty': 0.0-1.0      # Сложность отладки
-    }
+        theoretical_power: 0.0,          // Насколько близко к идеалу
+        practical_speed: 0,              // Реальная производительность
+        resource_cost: 0,                // Стоимость вычислений
+        implementation_complexity: 0,    // Строки кода
+        debug_difficulty: 0.0            // Сложность отладки
+    };
+}
 ```
 
 **Правило принятия решений:**

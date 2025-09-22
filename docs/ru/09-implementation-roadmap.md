@@ -11,23 +11,31 @@
 
 ### Минимальный Эксперимент (10 дней)
 
-```python
-# Простейшая реализация для валидации
-class MinimalAURA:
-    def __init__(self):
-        self.fast_layer = SimplePerceptron()     # τ=10ms, accuracy=70%
-        self.medium_layer = SmallNN()            # τ=100ms, accuracy=85%
-        self.slow_layer = LargeTransformer()     # τ=1000ms, accuracy=95%
+```typescript
+// Простейшая реализация для валидации
+class MinimalAURA {
+    private fastLayer: SimplePerceptron;     // τ=10ms, accuracy=70%
+    private mediumLayer: SmallNN;            // τ=100ms, accuracy=85%
+    private slowLayer: LargeTransformer;     // τ=1000ms, accuracy=95%
 
-    def process(self, task):
-        complexity = estimate_complexity(task)
+    constructor() {
+        this.fastLayer = new SimplePerceptron();
+        this.mediumLayer = new SmallNN();
+        this.slowLayer = new LargeTransformer();
+    }
 
-        if complexity < 0.3:
-            return self.fast_layer(task)
-        elif complexity < 0.7:
-            return self.medium_layer(task)
-        else:
-            return self.slow_layer(task)
+    process(task: any): any {
+        const complexity = estimateComplexity(task);
+
+        if (complexity < 0.3) {
+            return this.fastLayer.process(task);
+        } else if (complexity < 0.7) {
+            return this.mediumLayer.process(task);
+        } else {
+            return this.slowLayer.process(task);
+        }
+    }
+}
 ```
 
 ### Метрики Валидации
@@ -227,73 +235,82 @@ aura-core/
 ### Конкретные Эксперименты для Валидации
 
 #### Эксперимент 1: Адаптивная Сложность
-```python
-def test_adaptive_complexity():
-    tasks = generate_variable_complexity_tasks(n=1000)
+```typescript
+function testAdaptiveComplexity(): void {
+    const tasks = generateVariableComplexityTasks(1000);
 
-    metrics = {
-        'simple_speedup': [],  # Ожидается 5-10x
-        'complex_quality': [],  # Ожидается <5% потери
-        'mode_switches': []     # Ожидается >80% правильных
+    const metrics = {
+        simple_speedup: [] as number[],  // Ожидается 5-10x
+        complex_quality: [] as number[],  // Ожидается <5% потери
+        mode_switches: [] as number[]     // Ожидается >80% правильных
+    };
+
+    for (const task of tasks) {
+        const result = aura.process(task);
+        const baseline = fixedModel.process(task);
+
+        metrics.simple_speedup.push(
+            task.isSimple ? baseline.time / result.time : 1
+        );
+        metrics.complex_quality.push(
+            task.isComplex ? result.accuracy / baseline.accuracy : 1
+        );
+        metrics.mode_switches.push(
+            result.mode === expectedMode(task) ? 1 : 0
+        );
     }
 
-    for task in tasks:
-        result = aura.process(task)
-        baseline = fixed_model.process(task)
-
-        metrics['simple_speedup'].append(
-            baseline.time / result.time if task.is_simple else 1
-        )
-        metrics['complex_quality'].append(
-            result.accuracy / baseline.accuracy if task.is_complex else 1
-        )
-        metrics['mode_switches'].append(
-            1 if result.mode == expected_mode(task) else 0
-        )
-
-    assert np.mean(metrics['simple_speedup']) > 5.0
-    assert np.mean(metrics['complex_quality']) > 0.95
-    assert np.mean(metrics['mode_switches']) > 0.8
+    console.assert(mean(metrics.simple_speedup) > 5.0);
+    console.assert(mean(metrics.complex_quality) > 0.95);
+    console.assert(mean(metrics.mode_switches) > 0.8);
+}
 ```
 
 #### Эксперимент 2: Эмерджентная Специализация
-```python
-def test_emergent_specialization():
-    # Запускаем систему без предопределённых ролей
-    system = AURA(agents=10000, predefined_roles=None)
+```typescript
+function testEmergentSpecialization(): void {
+    // Запускаем систему без предопределённых ролей
+    const system = new AURA({ agents: 10000, predefinedRoles: null });
 
-    # Обучаем на разнообразных задачах
-    for _ in range(10000):
-        task = sample_diverse_task()
-        system.process(task)
+    // Обучаем на разнообразных задачах
+    for (let i = 0; i < 10000; i++) {
+        const task = sampleDiverseTask();
+        system.process(task);
+    }
 
-    # Анализируем возникшие роли
-    role_distribution = analyze_agent_behaviors(system)
+    // Анализируем возникшие роли
+    const roleDistribution = analyzeAgentBehaviors(system);
 
-    # Метрики специализации
-    entropy = compute_entropy(role_distribution)
-    modularity = compute_modularity(system.interaction_graph)
+    // Метрики специализации
+    const entropy = computeEntropy(roleDistribution);
+    const modularity = computeModularity(system.interactionGraph);
+    const uniqueRoles = new Set(roleDistribution).size;
 
-    assert entropy > 2.5  # Высокое разнообразие ролей
-    assert modularity > 0.6  # Чёткие функциональные модули
-    assert len(np.unique(role_distribution)) > 10  # Минимум 10 различных ролей
+    console.assert(entropy > 2.5, "Высокое разнообразие ролей");
+    console.assert(modularity > 0.6, "Чёткие функциональные модули");
+    console.assert(uniqueRoles > 10, "Минимум 10 различных ролей");
+}
 ```
 
 #### Эксперимент 3: Квантовое Преимущество
-```python
-def test_quantum_advantage():
-    # Задача: поиск в неструктурированной базе данных
-    database_size = 2**20  # ~1 миллион элементов
+```typescript
+function testQuantumAdvantage(): void {
+    // Задача: поиск в неструктурированной базе данных
+    const databaseSize = Math.pow(2, 20);  // ~1 миллион элементов
 
-    # Классический подход
-    classical_time = measure_classical_search(database_size)
+    // Классический подход
+    const classicalTime = measureClassicalSearch(databaseSize);
 
-    # AURA с квантовым компонентом
-    quantum_time = measure_quantum_inspired_search(database_size)
+    // AURA с квантовым компонентом
+    const quantumTime = measureQuantumInspiredSearch(databaseSize);
 
-    speedup = classical_time / quantum_time
+    const speedup = classicalTime / quantumTime;
 
-    assert speedup > np.sqrt(database_size) * 0.5  # Минимум 50% от теоретического
+    console.assert(
+        speedup > Math.sqrt(databaseSize) * 0.5,
+        "Минимум 50% от теоретического"
+    );
+}
 ```
 - ✓ Простая навигация в лабиринте 20x20
 - ✓ Распознавание паттернов в последовательностях

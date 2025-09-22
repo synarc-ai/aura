@@ -157,25 +157,35 @@
 
 Для каждого архитектурного выбора оцениваем:
 
-```python
-def evaluate_tradeoff(option):
-    return {
-        'implementation_cost': hours_to_implement,
-        'runtime_cost': cost_per_1M_operations,
-        'generality_score': 0.0 - 1.0,
-        'speed_score': operations_per_second,
-        'maintainability': 0.0 - 1.0,
-        'technical_debt': future_refactoring_hours
-    }
-
-# Выбираем опцию с лучшим weighted score
-weight = {
-    'speed': 0.3,      # Критично для конкуренции
-    'generality': 0.2, # Важно для AGI
-    'cost': 0.2,       # Практические ограничения
-    'maintainability': 0.2,
-    'debt': 0.1
+```typescript
+interface TradeoffMetrics {
+    implementationCost: number;    // hours_to_implement
+    runtimeCost: number;          // cost_per_1M_operations
+    generalityScore: number;      // 0.0 - 1.0
+    speedScore: number;           // operations_per_second
+    maintainability: number;      // 0.0 - 1.0
+    technicalDebt: number;        // future_refactoring_hours
 }
+
+function evaluateTradeoff(option: any): TradeoffMetrics {
+    return {
+        implementationCost: option.hoursToImplement,
+        runtimeCost: option.costPer1MOperations,
+        generalityScore: option.generalityScore, // 0.0 - 1.0
+        speedScore: option.operationsPerSecond,
+        maintainability: option.maintainability, // 0.0 - 1.0
+        technicalDebt: option.futureRefactoringHours
+    };
+}
+
+// Выбираем опцию с лучшим weighted score
+const weights = {
+    speed: 0.3,          // Критично для конкуренции
+    generality: 0.2,     // Важно для AGI
+    cost: 0.2,           // Практические ограничения
+    maintainability: 0.2,
+    debt: 0.1
+};
 ```
 
 ### 12. Честная Оценка Слабых Мест
