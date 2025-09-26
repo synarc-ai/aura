@@ -9,9 +9,9 @@ import { join, dirname } from 'path';
  * Версия берётся из package.json
  */
 
-const V03_DIR = join(import.meta.dir, '..', 'docs', 'ru');
-const OUTPUT_FILE = join(import.meta.dir, '..', 'docs', 'ru', 'full.md');
-const PACKAGE_JSON_PATH = join(V03_DIR, 'package.json');
+const V03_DIR = join(import.meta.dir, '..', 'docs', 'aura', 'ru');
+const OUTPUT_FILE = join(import.meta.dir, '..', 'docs', 'aura', 'ru', 'full.md');
+const PACKAGE_JSON_PATH = join(import.meta.dir, '..', 'package.json');
 
 /**
  * Получает версию из package.json
@@ -157,8 +157,7 @@ function generateHeader(version: string): string {
 
 *Этот документ объединяет все файлы спецификации AURA v${version} в единый документ согласно порядку, указанному в README.md*
 
-**Дата создания:** ${new Date().toLocaleDateString('ru-RU')}  
-**Автоматически сгенерировано скриптом merge-docs.ts**
+**Дата создания:** ${new Date().toLocaleDateString('ru-RU')} (автоматически сгенерировано)  
 
 ---
 

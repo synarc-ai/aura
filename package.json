@@ -1,13 +1,13 @@
 {
   "name": "aura",
-  "version": "0.5.0",
-  "description": "Adaptive Unified Resonant Architecture",
+  "version": "0.5.1",
+  "description": "Adaptive Unified Resonant Architecture with Meta-Linguistics and Meta-Cognition Theory",
   "type": "module",
   "scripts": {
     "merge": "bun run merge-docs.ts",
     "merge:docs": "bun run merge-docs.ts"
   },
-  "keywords": ["aura", "AGI", "agents"],
+  "keywords": ["aura", "AGI", "agents", "meta-linguistics", "meta-theory", "psi-system", "psi-theory"],
   "author": "LuxQuant",
   "license": "MIT",
   "engines": {

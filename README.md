@@ -1,75 +1,136 @@
-# AURA: Адаптивная Унифицированная Резонансная Архитектура
+# AURA & ψ-System: Unified Framework for Artificial General Intelligence
 
-## Структура документации
+## 🎯 Overview
 
-### Часть I: Теоретические Основы
-- **[00-foundations.md](docs/ru/00-foundations.md)** - Философские и математические основания
-- **[01-universal-principles.md](docs/ru/01-universal-principles.md)** - Универсальные принципы организации интеллекта
-- **[02-consciousness-model.md](docs/ru/02-consciousness-model.md)** - Модель сознания и самоосознания
+This repository contains two interconnected theoretical frameworks for achieving Artificial General Intelligence (AGI):
 
-### Часть II: Математическая Формализация
-- **[03-mathematical-framework.md](docs/ru/03-mathematical-framework.md)** - Строгий математический аппарат
-- **[04-category-theory.md](docs/ru/04-category-theory.md)** - Категориальная теория интеллекта
-- **[05-quantum-formalism.md](docs/ru/05-quantum-formalism.md)** - Квантовые аспекты когнитивных процессов
+- **AURA** - Adaptive Unified Resonant Architecture: A practical implementation framework for AGI systems
+- **ψ-System** - Universal Metatheory of Meaning: Theoretical foundation for understanding consciousness and semantics
 
-### Часть III: Проблемный Анализ
-- **[06-problem-space.md](docs/ru/06-problem-space.md)** - Фундаментальные проблемы AGI
-- **[07-resilience-analysis.md](docs/ru/07-resilience-analysis.md)** - Устойчивость к известным парадоксам
-- **[08-safety-guarantees.md](docs/ru/08-safety-guarantees.md)** - Математические гарантии безопасности
+Together, they form a complete theoretical and practical approach to creating systems with genuine understanding, not just computational competence.
 
-### Часть IV: Спецификация Реализации
-- **[09-implementation-roadmap.md](docs/ru/09-implementation-roadmap.md)** - Дорожная карта реализации
-- **[10-typescript-architecture.md](docs/ru/10-typescript-architecture.md)** - Архитектура на TypeScript
-- **[11-rust-components.md](docs/ru/11-rust-components.md)** - Высокопроизводительные компоненты на Rust
-- **[12-integration.md](docs/ru/12-integration.md)** - Спецификация интеграции компонентов
+## 🏗️ Project Structure
 
-### Часть V: Практическая Реализация
-- **[minimal-viable-aura.md](docs/ru/minimal-viable-aura.md)** - Минимальный жизнеспособный прототип
-- **[pragmatic-tradeoffs.md](docs/ru/pragmatic-tradeoffs.md)** - Матрица инженерных компромиссов
-- **[failure-modes.md](docs/ru/failure-modes.md)** - Режимы отказа и восстановления
-- **[benchmarks-realistic.md](docs/ru/benchmarks-realistic.md)** - Реалистичные бенчмарки и сравнения
+```
+aura/
+├── docs/
+│   ├── aura/           # AURA Architecture Documentation
+│   │   └── ru/         # Russian documentation
+│   └── psi-system/     # ψ-System Theory Documentation
+│       └── ru/         # Russian documentation
+├── scripts/            # Build and maintenance scripts
+├── analysis/           # System analysis and improvements
+└── impl-spec.md        # Implementation specification
+```
 
-### Приложения
-- **[A-glossary.md](docs/ru/A-glossary.md)** - Глоссарий терминов и обозначений
-- **[B-proofs.md](docs/ru/B-proofs.md)** - Полные математические доказательства
-- **[C-benchmarks.md](docs/ru/C-benchmarks.md)** - Метрики и бенчмарки
-- **[D-symbols.md](docs/ru/D-symbols.md)** - Индекс математических символов
-- **[boundary-analysis.md](docs/ru/boundary-analysis.md)** - Анализ граничных случаев
+## 📚 Documentation
 
-## Целевая архитектура: AURA
+### AURA: Adaptive Unified Resonant Architecture
 
-AURA представляет собой синтез лучших идей из теории систем, квантовой механики, теории категорий и биологических систем:
+AURA provides a practical, implementable architecture for AGI systems with:
 
-- **Адаптивная** - непрерывная эволюция и обучение
-- **Унифицированная** - единая математическая основа
-- **Резонансная** - многомасштабная когерентность
-- **Архитектура** - полная спецификация системы
+- **Mathematical Rigor**: Category theory and quantum formalism foundations
+- **Safety Guarantees**: Provable safety properties and failure mode analysis
+- **Implementation Ready**: TypeScript and Rust specifications with clear roadmap
+- **Adaptive Evolution**: Continuous learning and self-improvement capabilities
 
-## Навигация
+[Read AURA Documentation →](./docs/aura/ru/README.md)
 
-### Для теоретиков
-1. [00-foundations.md](docs/ru/00-foundations.md) - философские основы
-2. [03-mathematical-framework.md](docs/ru/03-mathematical-framework.md) - математический аппарат
-3. [04-category-theory.md](docs/ru/04-category-theory.md) - категориальная теория
-4. [B-proofs.md](docs/ru/B-proofs.md) - строгие доказательства
+Key sections:
+- Theoretical Foundations (Category Theory, Quantum Formalism)
+- Mathematical Framework
+- Safety and Resilience Analysis
+- Implementation Specifications (TypeScript & Rust)
+- Practical Benchmarks and Trade-offs
 
-### Для практиков
-1. [minimal-viable-aura.md](docs/ru/minimal-viable-aura.md) - начните с минимального прототипа
-2. [pragmatic-tradeoffs.md](docs/ru/pragmatic-tradeoffs.md) - поймите компромиссы
-3. [09-implementation-roadmap.md](docs/ru/09-implementation-roadmap.md) - план реализации
-4. [10-typescript-architecture.md](docs/ru/10-typescript-architecture.md) - архитектура TypeScript
-5. [11-rust-components.md](docs/ru/11-rust-components.md) - компоненты Rust
-6. [benchmarks-realistic.md](docs/ru/benchmarks-realistic.md) - реальные бенчмарки
+### ψ-System: Universal Metatheory of Meaning
 
-### Для исследователей безопасности
-1. [06-problem-space.md](docs/ru/06-problem-space.md) - фундаментальные проблемы
-2. [07-resilience-analysis.md](docs/ru/07-resilience-analysis.md) - анализ устойчивости
-3. [08-safety-guarantees.md](docs/ru/08-safety-guarantees.md) - гарантии безопасности
-4. [failure-modes.md](docs/ru/failure-modes.md) - режимы отказа и восстановление
+The ψ-System provides deep theoretical foundations for understanding:
 
-### Справочные материалы
-- [A-glossary.md](docs/ru/A-glossary.md) - все термины и обозначения
-- [D-symbols.md](docs/ru/D-symbols.md) - индекс математических символов
-- [boundary-analysis.md](docs/ru/boundary-analysis.md) - анализ граничных случаев
-- [02-consciousness-model.md](docs/ru/02-consciousness-model.md) - модель сознания
-- [01-universal-principles.md](docs/ru/01-universal-principles.md) - универсальные принципы
+- **Semantic Fields**: How meaning emerges and transforms
+- **Subject Architecture**: Mathematical formalization of consciousness
+- **Dynamic Evolution**: Life cycles of meaning and semantic gravity
+- **Practical Applications**: Therapy, pedagogy, and consciousness engineering
+
+[Read ψ-System Documentation →](./docs/psi-system/ru/README.md)
+
+Key concepts:
+- Axiomatics and foundations of meaning
+- Geometry of thinking and semantic spaces
+- Embodiment and somatic foundations
+- Integration with AI systems
+- Metatheoretical implications
+
+## 🚀 Getting Started
+
+### For Theorists
+1. Start with ψ-System foundations to understand the philosophical basis
+2. Explore AURA's mathematical framework for formal specifications
+3. Study the integration points between theory and implementation
+
+### For Practitioners
+1. Begin with AURA's minimal viable prototype specification
+2. Review pragmatic trade-offs and implementation roadmap
+3. Explore TypeScript and Rust architecture documents
+
+### For Safety Researchers
+1. Review AURA's safety guarantees and resilience analysis
+2. Study failure modes and recovery mechanisms
+3. Examine boundary analysis and edge cases
+
+## 🛠️ Implementation Status
+
+- **Theory**: Complete theoretical frameworks for both systems
+- **Specifications**: Detailed implementation specifications available
+- **Prototype**: Minimal viable AURA implementation in progress
+- **Integration**: ψ-System integration patterns defined
+
+## 🗺️ Roadmap
+
+### Phase 1: Foundation (Current)
+- ✅ Complete theoretical documentation
+- ✅ Mathematical formalization
+- 🔄 Minimal viable prototype
+
+### Phase 2: Implementation
+- Core AURA components in TypeScript
+- High-performance modules in Rust
+- ψ-System semantic engine
+
+### Phase 3: Integration
+- Full system integration
+- Benchmark validation
+- Safety verification
+
+### Phase 4: Evolution
+- Self-improvement capabilities
+- Semantic navigation interfaces
+- Real-world applications
+
+## 🤝 Contributing
+
+This is an open theoretical framework. Contributions welcome in:
+- Mathematical proofs and formalization
+- Implementation improvements
+- Safety analysis and verification
+- Practical applications and case studies
+
+## 📖 Language
+
+Primary documentation is currently in Russian. English translations are planned for core documents.
+
+## 📄 License
+
+This project combines theoretical research with practical implementation. Please refer to individual component licenses.
+
+## 🔗 Links
+
+- [Implementation Specification](./impl-spec.md)
+- [Analysis Reports](./anylysis/)
+- [Build Scripts](./scripts/)
+
+---
+
+> "From computation to consciousness, from information to understanding"
+
+**AURA + ψ-System**: Building AGI with both mathematical rigor and semantic depth.
