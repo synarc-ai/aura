@@ -295,7 +295,6 @@ export default function HeroSection() {
               exit={{ opacity: 0, y: 20 }}
               transition={{
                 opacity: { duration: 0.3 },
-                exit: { duration: 0.2 },
                 y: { duration: 2, repeat: Infinity, ease: 'easeInOut' }
               }}
             >
