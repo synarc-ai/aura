@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
+const isProduction = process.env.DEPLOY_TARGET === 'production';
+
 const nextConfig = {
   output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? '/aura' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/aura/' : '',
+  basePath: isProduction ? '/synarc' : '',
+  assetPrefix: isProduction ? '/synarc/' : '',
   images: {
     unoptimized: true,
   },

@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "build:local": "next build",
+    "build:production": "DEPLOY_TARGET=production next build",
+    "start": "next start",
+    "serve:local": "cd out && python3 -m http.server 8000"
   },
   "dependencies": {
     "next": "14.2.5",
