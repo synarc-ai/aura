@@ -226,9 +226,7 @@ function BindingTree({ level = 0, position = [0, 0, 0] as [number, number, numbe
             <bufferGeometry>
               <bufferAttribute
                 attach="attributes-position"
-                count={2}
-                array={new Float32Array([0, 0, 0, ...childPos])}
-                itemSize={3}
+                args={[new Float32Array([0, 0, 0, ...childPos]), 3]}
               />
             </bufferGeometry>
             <lineBasicMaterial color="#8b5cf6" opacity={0.3} transparent />
@@ -339,9 +337,7 @@ function InfoParticles() {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={particleCount}
-          array={positions}
-          itemSize={3}
+          args={[positions, 3]}
         />
       </bufferGeometry>
       <pointsMaterial

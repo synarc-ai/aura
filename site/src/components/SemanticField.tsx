@@ -10,7 +10,15 @@ import { createNoise3D } from 'simplex-noise'
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      semanticFieldMaterial: any
+      semanticFieldMaterial: React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          ref?: any;
+          transparent?: boolean;
+          depthWrite?: boolean;
+          blending?: any;
+        },
+        HTMLElement
+      >;
     }
   }
 }
@@ -180,8 +188,8 @@ const SemanticFieldMaterial = shaderMaterial(
 extend({ SemanticFieldMaterial })
 
 function SemanticFieldMesh() {
-  const meshRef = useRef<any>()
-  const materialRef = useRef<any>()
+  const meshRef = useRef<any>(null)
+  const materialRef = useRef<any>(null)
   const noise = useMemo(() => createNoise3D(), [])
 
   useFrame(({ clock, mouse }) => {
@@ -199,6 +207,7 @@ function SemanticFieldMesh() {
   return (
     <mesh ref={meshRef} scale={[15, 15, 1]}>
       <planeGeometry args={[1, 1, 128, 128]} />
+      {/* @ts-ignore - custom shader material */}
       <semanticFieldMaterial
         ref={materialRef}
         transparent

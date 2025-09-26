@@ -1,0 +1,14 @@
+# Allow Sansation fonts
+!Sansation-*.ttf
+
+# Ignore other font files
+*.ttf
+*.otf
+*.woff
+*.woff2
+
+# Keep README
+!README.md
+
+# Keep placeholder files for build
+!.gitkeep

@@ -17,7 +17,7 @@ import { useI18n } from '@/lib/i18n/context'
 // })
 
 // Second version - advanced ψ-field visualization
-const PsiFieldVisualization = dynamic(() => import('@/components/PsiFieldVisualization'), {
+const PsiFieldVisualization = dynamic(() => import('@/components/PsiFieldVisualizationWrapper'), {
   ssr: false,
   loading: () => <div className="w-full h-[600px] loading-pulse" />
 })

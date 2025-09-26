@@ -65,15 +65,11 @@ function PredifferentialPotentiality({ active }: { active: boolean }) {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={particleCount}
-          array={positions}
-          itemSize={3}
+          args={[positions, 3]}
         />
         <bufferAttribute
           attach="attributes-color"
-          count={particleCount}
-          array={colors}
-          itemSize={3}
+          args={[colors, 3]}
         />
       </bufferGeometry>
       <pointsMaterial
@@ -89,18 +85,18 @@ function PredifferentialPotentiality({ active }: { active: boolean }) {
 }
 
 // Resonant Navigator - the subject navigating the semantic field
-function ResonantNavigator({ target }: { target: THREE.Vector3 }) {
+function ResonantNavigator({ target }: { target: THREE.Vector3 | null }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const groupRef = useRef<THREE.Group>(null)
-  const [position] = useState(new THREE.Vector3(0, 0, 0))
+  const positionRef = useRef(new THREE.Vector3(0, 0, 0))
 
   useFrame(({ clock }) => {
-    if (meshRef.current && groupRef.current) {
+    if (meshRef.current && groupRef.current && target) {
       const time = clock.getElapsedTime()
 
       // Navigate towards semantic targets with resonance
-      position.lerp(target, 0.02)
-      groupRef.current.position.copy(position)
+      positionRef.current.lerp(target, 0.02)
+      groupRef.current.position.copy(positionRef.current)
 
       // Pulsation showing resonance intensity
       const resonance = 1 + Math.sin(time * 3) * 0.2
@@ -581,11 +577,32 @@ function SemanticGradientField() {
   )
 }
 
+// Camera Controller Component
+function CameraController() {
+  const { camera } = useThree()
+
+  useFrame(({ clock }) => {
+    // Dynamic camera movement
+    const time = clock.getElapsedTime()
+    camera.position.x = Math.sin(time * 0.05) * 3
+    camera.position.y = 10 + Math.cos(time * 0.07) * 2
+    camera.lookAt(0, 0, 0)
+  })
+
+  return null
+}
+
 // Main Scene Orchestrator
 function PsiFieldScene() {
-  const { camera } = useThree()
-  const [navigationTarget, setNavigationTarget] = useState(new THREE.Vector3(0, 0, 0))
+  const [navigationTarget, setNavigationTarget] = useState<THREE.Vector3 | null>(null)
   const [differentiationActive, setDifferentiationActive] = useState(false)
+
+  // Initialize navigation target on client side
+  useEffect(() => {
+    if (!navigationTarget && typeof window !== 'undefined') {
+      setNavigationTarget(new THREE.Vector3(0, 0, 0))
+    }
+  }, [])
 
   // Simulate semantic navigation
   useEffect(() => {
@@ -600,16 +617,9 @@ function PsiFieldScene() {
     return () => clearInterval(interval)
   }, [])
 
-  useFrame(({ clock }) => {
-    // Dynamic camera movement
-    const time = clock.getElapsedTime()
-    camera.position.x = Math.sin(time * 0.05) * 3
-    camera.position.y = 10 + Math.cos(time * 0.07) * 2
-    camera.lookAt(0, 0, 0)
-  })
-
   return (
     <>
+      <CameraController />
       <fog attach="fog" args={['#000511', 10, 40]} />
 
       {/* Lighting setup */}
@@ -622,7 +632,7 @@ function PsiFieldScene() {
       {/* Core Components */}
       <SemanticGradientField />
       <PredifferentialPotentiality active={differentiationActive} />
-      <ResonantNavigator target={navigationTarget} />
+      {navigationTarget && <ResonantNavigator target={navigationTarget} />}
       <VSAOperations />
       <HolographicMemory />
       <MeaningLifeCycle />
@@ -638,7 +648,7 @@ function PsiFieldScene() {
         />
         <ChromaticAberration
           blendFunction={BlendFunction.NORMAL}
-          offset={new THREE.Vector2(0.0005, 0.0005)}
+          offset={typeof THREE !== 'undefined' ? new THREE.Vector2(0.0005, 0.0005) : [0.0005, 0.0005] as any}
           radialModulation={false}
           modulationOffset={0}
         />
@@ -675,7 +685,7 @@ export default function PsiFieldVisualization() {
         camera={{ position: [0, 10, 20], fov: 50 }}
         gl={{
           antialias: true,
-          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMapping: typeof THREE !== 'undefined' ? THREE.ACESFilmicToneMapping : 4,
           toneMappingExposure: 0.8
         }}
       >
